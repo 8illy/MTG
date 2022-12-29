@@ -8,6 +8,11 @@ let activeAction = undefined;
 let scryPile = undefined;
 let loadPile = undefined;
 
+function host(){
+	let username = $("#dbOpponent").val();
+	dbClient.connectOpponent(username);
+}
+
 function login(){
 	let username = $("#dbUser").val();
 	let password = $("#dbPass").val();

@@ -140,6 +140,7 @@ console.log("onData",msg);
 			if(sender==this.opponent){
 				if(data.action=="Start Game"){
 					processDeckList(data.deck,player1);
+					$("#opponentForm").hide();
 				}else if(data.action=="Move To"){
 					let card = cards[data.uid];
 					let pile = piles[data.player][data.pile];
