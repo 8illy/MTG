@@ -110,7 +110,11 @@ function processDeckList(rawTxt,ownerPlayer){
 	
 	doRequest("https://api.scryfall.com/cards/collection","POST",payload,headers,function(resp){
 		createDeck(resp,lines,ownerPlayer);
-		$("#opponentForm").show();
+		
+		if(ownerPlayer==player2){
+			$("#opponentForm").show();
+		}
+		
 		$("#boardContainer").show();
 	});
 	
