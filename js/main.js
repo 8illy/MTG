@@ -30,9 +30,9 @@ $(document).ready(()=>{
 	window.addEventListener("contextmenu", e => e.preventDefault());
 	window.addEventListener("mousedown", function(e){ if(e.button == 1){ e.preventDefault(); } });
 	
-	if(localStorage.getItem("login")){
-		login();
-	}
+	//if(localStorage.getItem("login")){
+	//	login();
+	//}
 	//let urlParams = new URL(window.location).searchParams;
 	//
 	//let username = urlParams.get("username");

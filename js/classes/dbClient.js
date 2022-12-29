@@ -8,11 +8,11 @@ class DBClient{
 	}
 
 	login(){
-		
+		/*
 		if(localStorage.getItem("login")){
 			this.processLogin();
 			return;
-		}
+		}*/
 		
 		let payload = { 
 				username: this.username,
@@ -25,13 +25,13 @@ class DBClient{
 		let headers = {"Content-Type": "application/x-www-form-urlencoded"};
 		
 		doRequest("https://www.duelingbook.com/php-scripts/login-user.php","POST",formData,headers,(resp)=>{
-			localStorage.setItem("login",resp);
-			this.processLogin();
+			//localStorage.setItem("login",resp);
+			this.processLogin(JSON.parse(resp));
 		});
 	}
 	
-	processLogin(){
-		let data =JSON.parse(localStorage.getItem("login"));//JSON.parse(resp);
+	processLogin(data){
+		//let data =JSON.parse(localStorage.getItem("login"));//JSON.parse(resp);
 		if(data.message =="Invalid password"){
 			//todo;
 			alert("Invalid Password");
@@ -123,6 +123,7 @@ console.log("sendToOpponent",data);
 			console.log("Connected");
 			
 			$("#loginForm").hide();
+			$("#deckInput").show();
 			
 		}else if(msg.action == "Lost connection"){
 			console.log("Lost Connection");
