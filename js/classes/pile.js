@@ -1,0 +1,202 @@
+class Pile{
+	
+	constructor(type=PILE_GENERIC,faceUp=false,spread=false,player,pileClass){
+		this.faceUp = faceUp;
+		this.spread = spread;
+		this.type = type;//PILE_DECK
+		this.cards = [];
+		this.player = player;
+		this.pileClass = pileClass;
+
+		if(this.player){
+			piles[this.player.player][this.pileClass] = this;
+			
+			this.addDropEvent();
+		}
+		
+	}
+	
+	setPlayer(player){
+		console.log(player);
+		this.player = player;
+		piles[this.player.player][this.pileClass?this.pileClass:"generic"] = this;
+	}
+	
+	get $(){
+		
+		let sel = `.playerSide[player='${this.player.player}'] .${this.pileClass}`;
+
+		return $(sel);
+	}
+	
+	get topCard(){
+		return this.cards[0];
+	}
+		
+	addCard(input,toTop){
+		//input can be an existing card, or a card id
+		//if it is a card id need to create a new card.
+		//by default add to the bottom (highest index)
+		let card = this.getOrCreateCard(input);
+		let index;
+		if(toTop){
+			this.cards.unshift(card);
+			index = 0;
+		}else{
+			index = this.cards.push(card);
+		}
+				
+		card.pile = this;
+		
+		return card;
+	}
+	
+	
+	getOrCreateCard(input){
+		//card id or card object to card object
+		if(input instanceof Card){
+			return input;
+		}else{
+			return new Card(input,this.player);
+		}
+	}
+	
+	getExistingCard(index){
+		//card index or card object to card object
+		if(index instanceof Card){
+			return index;
+		}else{
+			return this.cards[index];
+		}
+	}
+	
+	removeCard(input){
+		//input can be an existing card, or an index
+		let index = input;
+		if(input instanceof Card){
+			index = this.cards.indexOf(input);
+		}
+		if(index==-1){
+			return undefined;
+		}
+		return this.cards.splice(index,1)[0];
+	}
+	
+	moveCard(input,newIndex){
+		//input can be an existing card, or an index		
+		let card = getExistingCard(input);
+		arr.splice(card.index, 1);
+		arr.splice(newIndex, 0, card);
+	}
+	
+	
+	
+	shuffle(){
+		this.cards = shuffle(this.cards);
+		let order = this.cards.map((e)=>{return e.uidNumber});
+		
+		//todo - if opps card is in hand send its uid as negative, and detect this in setshuffle.
+		
+		this.render();
+		dbClient.sendToOpponent({
+			"action" : "Shuffle",
+			"pile" : this.pileClass,
+			"player" : this.player.player,
+			"order" : JSON.stringify(order),
+		});
+		
+	}
+	
+	empty(){
+		for(let card of this.cards){
+			if(card.scryPile==this){
+				delete card.scryPile;
+			}
+			if(card.pile==this){
+				delete card.pile;
+			}
+		}
+		this.cards = [];
+	}
+	
+	scry(num,oppAction){
+		num = num?num:$("#scryNumber").val();
+		if(num){
+			scryPile = new Pile();
+			scryPile.cards = this.cards.slice(0,num);
+			for(let card of scryPile.cards){
+				card.scryPile = scryPile;
+			}
+			scryPile.viewPile();
+			scryPile.parentPile = this;
+			this.render();
+		}
+		
+		if(!oppAction){
+			dbClient.sendToOpponent({
+				"action" : "Scry",
+				"pile" : this.pileClass,
+				"player" : this.player.player,
+				"number" : num,
+				"reveal" : $("#scryOpponent").prop("checked"),
+			});
+		}
+		
+	}
+	
+	reveal(){
+		dbClient.sendToOpponent({
+			"action" : "Reveal",
+			"pile" : this.pileClass,
+			"player" : this.player.player,
+		});
+	}
+	
+	setShuffle(order){
+		this.cards.sort((a,b)=>{
+			let indexA = order.findIndex((e)=>{return e==a.uidNumber});
+			let indexB = order.findIndex((e)=>{return e==b.uidNumber});
+			return indexA-indexB;
+		});
+		this.render();
+	}
+	
+	handleDrop(card){
+		card.moveTo(this);
+	}
+	
+	addDropEvent(){		
+	
+		this.$.on('dragover', false).on('drop',(ev)=>{	
+			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
+			let card = cards[uid];
+			this.handleDrop(card);
+			return false;
+		});
+		
+		
+	}
+	
+	render(){
+		if(this.player){
+			let output = TemplateEngine(pileTemplate,this);
+			this.$.html(output);
+		}
+		if(activePile==this){
+			this.renderViewPile();
+		}
+	}
+	
+	renderViewPile(){
+		let output = TemplateEngine(viewPileTemplate,this);
+		$("#pileDisplayModal-body").html(output);
+	}
+	
+	viewPile(){
+		activePile = this;
+		this.render();
+		$("#pileDisplayModal").modal("show");
+		
+	}
+	
+}

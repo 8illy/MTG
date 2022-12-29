@@ -1,0 +1,23 @@
+4 Auntie's Hovel
+4 Bitterblossom
+4 Blightning
+4 Boggart Ram-Gang
+4 Figure of Destiny
+4 Flame Javelin
+4 Ghitu Encampment
+4 Graven Cairns
+4 Incinerate
+4 Magma Spray
+6 Mountain
+3 Murderous Redcap
+3 Reflecting Pool
+4 Siege-Gang Commander
+4 Sulfurous Springs
+
+SIDEBOARD:
+3 Ashenmoor Gouger
+3 Infest
+1 Loxodon Warhammer
+2 Shriekmaw
+2 Spiteful Visions
+4 Vithian Stinger

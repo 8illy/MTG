@@ -1,0 +1,209 @@
+.row {
+    height: 150px;
+}
+
+.playerHand{
+	min-height:130px; /*to enable drag card into empty hand.*/
+}
+
+.container.field {
+    max-width: unset;
+}
+
+.playerSide:nth-child(1) {
+    rotate: 180deg;
+}
+
+.playerSide {
+    margin-top: 20px;
+}
+
+.pile{
+	margin-top: 10px;
+}
+
+.cardFrame {
+    display: inline;
+    margin-right: 10px;
+}
+
+.playerHand {
+    text-align: center;
+}
+
+.playerHand .cardFrame {
+    margin-left: -30px;
+}
+
+.playerHand img.cardImg {
+    transform-origin: bottom;
+}
+
+#boardContainer {
+    width: 100%;
+    max-width: unset;
+}
+
+.playerLands .tapped,
+.playerCreatures .tapped,
+.playerArtifacts .tapped{
+	rotate:270deg;
+}
+
+.playerHand .tapped{
+	rotate:0deg;
+	border:3px solid gold;
+}
+
+#cardPreviewContainer {
+    padding-top: 25px;
+}
+
+#cardPreviewContainer > .cardFrame, 
+#cardPreviewContainer > .cardFrame > .cardImg {
+    width: 100%;
+}
+
+.cardImg:not(.largeCardImg) {
+    height: 130px;
+    width: auto;
+}
+
+
+
+body{
+	background-color:#444!important;
+}
+#gameControls,
+#lifeCounter{
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 5px;
+    background: #eee;
+    margin-top: 5px;
+    text-align: center;
+}
+
+.activeAction{
+	background:green;
+}
+
+input#scryNumber {
+    width: 30px;
+}
+
+#gameControls .row {
+    height: 50px;
+}
+
+.controlRow > .controlRowInner {
+    text-align: right;
+    width: 50%;
+    margin: auto;
+    margin-left: 10%;
+    margin-top: 5px;
+}
+
+.playerLife {
+    width: 50px;
+}
+
+#pileDisplayModal > .modal-dialog {
+    margin: 0;
+    height: 100%;
+}
+
+div#pileDisplayModal {
+    width: 25%;
+    height: 30vh;
+    margin-left: 10px;
+    top: 70vh;
+}
+
+.modal-backdrop.show {
+    display:none;
+}
+
+#pileDisplayModal > .modal-dialog > .modal-content{
+	height: 100%;
+	overflow-y: hidden;
+}
+
+div#pileDisplayModal-body {
+    height: 80%;
+}
+
+.viewPile {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.viewPile img.cardImg {
+    margin-top: 10px;
+}
+
+/********/
+
+.playerPile:before {
+    position: absolute;
+    z-index: 0;
+	font-size: 6em;
+	
+	display:none;
+}
+
+.playerGrave:before,
+.playerExiled:before,
+.playerDeck:before{
+	font-size: 2em;
+}
+
+.playerGrave{
+    background: red;
+}
+.playerGrave:before {
+    content: "GRAVE";
+}
+
+.playerCreatures{
+    background: green;
+}
+.playerCreatures:before {
+    content: "CREATURES";
+}
+
+.playerArtifacts{
+    background: yellow;
+}
+.playerArtifacts:before {
+    content: "ARTIFACTS";
+}
+
+.playerExiled{
+    background: crimson;
+}
+.playerExiled:before {
+    content: "EXILED";
+}
+
+.playerDeck{
+    background: orange;
+}
+.playerDeck:before {
+    content: "DECK";
+}
+
+.playerLands{
+    background: purple;
+}
+.playerLands:before {
+    content: "LANDS";
+}
+
+
+.playerWalkers{
+    background: pink;
+}
+.playerWalkers:before {
+    content: "WALKERS";
+}
