@@ -8,14 +8,9 @@ let activeAction = undefined;
 let scryPile = undefined;
 let loadPile = undefined;
 
-$(document).ready(()=>{
-
-	window.addEventListener("contextmenu", e => e.preventDefault());
-	window.addEventListener("mousedown", function(e){ if(e.button == 1){ e.preventDefault(); } });
-	
-	let urlParams = new URL(window.location).searchParams;
-	let username = urlParams.get("username");
-	let password = urlParams.get("password")
+function login(){
+	let username = $("#dbUser").val();
+	let password = $("#dbPass").val();
 	
 	player1 = new Player(1);//upper
 	player2 = new Player(username);//lower
@@ -28,17 +23,21 @@ $(document).ready(()=>{
 	player1.piles.hand.faceUp = false;//cant see opps hand.
 	
 	dbClient = new DBClient(username,password);
+}
+
+$(document).ready(()=>{
+
+	window.addEventListener("contextmenu", e => e.preventDefault());
+	window.addEventListener("mousedown", function(e){ if(e.button == 1){ e.preventDefault(); } });
+	
+	if(localStorage.getItem("login")){
+		login();
+	}
+	//let urlParams = new URL(window.location).searchParams;
+	//
+	//let username = urlParams.get("username");
+	//let password = urlParams.get("password")
 	
 	
 
-	
-	//for(let i = 0;i<60;i++){
-	//	player2.piles.deck.addCard(debugCardData);
-	//}
-	//
-	//for(let i = 0;i<7;i++){
-	//	player2.draw();
-	//}
-	//
-	//player2.render();
 });

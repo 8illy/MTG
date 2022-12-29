@@ -18,9 +18,18 @@
 	</head>
 	
 	<body>
+	
+		
+	
+		<div id="loginForm">
+			<input type="text" name="dbUser" id="dbUser">
+			<input type="password" name="dbPass" id="dbPass">
+			<button onclick="login()">Login</button>
+		</div>
+		
 		<input type="file" name="deckInput" id="deckInput" onchange="importDeck(this.files[0])" accept=".txt">
 		
-		<div class = "container row" id="boardContainer">
+		<div class = "container row" id="boardContainer" style="display:none;">
 			<div id="leftSidebar" class="col-3">
 				<div id="cardPreviewContainer">
 					<div class="cardFrame">
