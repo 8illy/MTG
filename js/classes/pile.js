@@ -93,7 +93,9 @@ class Pile{
 	
 	shuffle(){
 		this.cards = shuffle(this.cards);
-		let order = this.cards.map((e)=>{return e.uidNumber});
+		let order = this.cards.map((e)=>{
+			return e.player==this.player? e.uidNumber:-e.uidNumber;
+		});
 		
 		//todo - if opps card is in hand send its uid as negative, and detect this in setshuffle.
 		
@@ -105,6 +107,16 @@ class Pile{
 			"order" : JSON.stringify(order),
 		});
 		
+	}
+		
+	setShuffle(order){
+		this.cards.sort((a,b)=>{			
+			let indexA = order.findIndex(getCardIndex(a,this.player));
+			let indexB = order.findIndex(getCardIndex(b,this.player));
+				
+			return indexA-indexB;
+		});
+		this.render();
 	}
 	
 	empty(){
@@ -150,15 +162,6 @@ class Pile{
 			"pile" : this.pileClass,
 			"player" : this.player.player,
 		});
-	}
-	
-	setShuffle(order){
-		this.cards.sort((a,b)=>{
-			let indexA = order.findIndex((e)=>{return e==a.uidNumber});
-			let indexB = order.findIndex((e)=>{return e==b.uidNumber});
-			return indexA-indexB;
-		});
-		this.render();
 	}
 	
 	handleDrop(card){

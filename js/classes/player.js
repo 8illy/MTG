@@ -3,7 +3,7 @@ class Player{
 	constructor(player){
 		this.player = player;
 		
-		this.cardUidCount = 0;
+		this.cardUidCount = 1;
 		this.life = 20;
 		
 		this.setUpField();

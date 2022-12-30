@@ -200,7 +200,7 @@ function loadNewCards(search){
 		piles["loadNewCards"] = {};
 		loadPile.setPlayer({
 			player : "loadNewCards",
-			cardUidCount : 0,
+			cardUidCount : 1,
 		});
 		let respData = JSON.parse(resp).data;
 		for(let cardData of respData){
@@ -208,4 +208,15 @@ function loadNewCards(search){
 		}
 		loadPile.viewPile();
 	});
+}
+
+
+function getCardIndex(a,player){
+	return (e)=>{
+		let uid = e;
+		if(uid<0){
+			uid = uid*-1;
+		}
+		return uid==a.uidNumber && ( (e<0 && a.player!=player)||(e>0 && a.player==player));
+	}
 }
