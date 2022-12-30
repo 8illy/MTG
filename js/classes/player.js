@@ -17,7 +17,7 @@ class Player{
 			hand : new Pile(PILE_HAND,true,true,this,"playerHand"),
 			
 			grave : new Pile(PILE_GRAVE,true,false,this,"playerGrave"),
-			exile : new Pile(PILE_EXILE,true,false,this,"playerExile"),
+			exile : new Pile(PILE_EXILE,true,false,this,"playerExiled"),
 			
 			creatures : new Pile(PILE_CREATURES,true,true,this,"playerCreatures"),
 			artifacts : new Pile(PILE_ARTIFACTS,true,true,this,"playerArtifacts"),
