@@ -85,8 +85,11 @@ function processDeckList(rawTxt,ownerPlayer){
 	let lines = rawTxt.split("\r\n");
 	lines = lines.filter(function(e){return !!e.trim()});
 	//for now ignore sideboard
-	if(lines.indexOf("SIDEBOARD:")){
+	if(lines.indexOf("SIDEBOARD:")!=-1){
 		lines = lines.slice(0,lines.indexOf("SIDEBOARD:"));
+	}	
+	if(lines.indexOf("sideboard")!=-1){
+		lines = lines.slice(0,lines.indexOf("sideboard"));
 	}
 
 	//get quantities & card names
