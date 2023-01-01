@@ -28,6 +28,14 @@ class Player{
 		
 	}
 	
+	reset(){
+		this.life = 20;
+		for(let pile of this.piles){
+			pile.empty();
+		}
+		/*TODO.*/
+	}
+	
 	get $(){
 		let sel = `.playerSide[player='${this.player}']`;
 		return $(sel);
@@ -58,6 +66,7 @@ class Player{
 	}
 	
 	setName(name){
+		this.lifeDisplay.find(".playerLifeLabel").text(name);
 		piles[name] = piles[this.player];
 		players[name] = this;
 		this.$.attr("player",name);

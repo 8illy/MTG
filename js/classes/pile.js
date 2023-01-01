@@ -119,6 +119,21 @@ class Pile{
 		this.render();
 	}
 	
+	untapAll(oppAction){
+		for(let card of this.cards){
+			card.tapped = false;
+		}
+		this.render();
+		
+		if(!oppAction){
+			dbClient.sendToOpponent({
+				"action" : "Untap All",
+				"pile" : this.pileClass,
+				"player" : this.player.player,
+			});
+		}
+	}
+	
 	empty(){
 		for(let card of this.cards){
 			if(card.scryPile==this){

@@ -17,17 +17,19 @@ function login(){
 	let username = $("#dbUser").val();
 	let password = $("#dbPass").val();
 	
+	setup();
+	
+	dbClient = new DBClient(username,password);
+}
+
+function setup(){
 	player1 = new Player(1);//upper
-	player2 = new Player(username);//lower
+	player2 = new Player(2);//lower
 	
 	player1.lifeDisplay = $('#player1LifeDisplay');
 	player2.lifeDisplay = $('#player2LifeDisplay');
 	
-	$('label[for="player2Life"]').text(username);
-	
 	player1.piles.hand.faceUp = false;//cant see opps hand.
-	
-	dbClient = new DBClient(username,password);
 }
 
 $(document).ready(()=>{
@@ -35,14 +37,9 @@ $(document).ready(()=>{
 	window.addEventListener("contextmenu", e => e.preventDefault());
 	window.addEventListener("mousedown", function(e){ if(e.button == 1){ e.preventDefault(); } });
 	
-	//if(localStorage.getItem("login")){
-	//	login();
-	//}
-	//let urlParams = new URL(window.location).searchParams;
-	//
-	//let username = urlParams.get("username");
-	//let password = urlParams.get("password")
+	/*if(localStorage.getItem("db_id")){
+		setup();
+		dbClient = new DBClient();
+	}*/
 	
-	
-
 });

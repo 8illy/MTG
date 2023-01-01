@@ -71,6 +71,30 @@ class Card{
 		
 	}
 	
+	clone(oppAction){
+		this.pile.addCard(clone(this.cardData));
+		this.pile.render();		
+		
+		if(!oppAction){
+			dbClient.sendToOpponent({
+				"action" : "Clone",
+				"uid" : this.uid,
+			});
+		}
+	}
+	
+	destroy(oppAction){
+		this.pile.removeCard(this);
+		this.pile.render();	
+		
+		if(!oppAction){
+			dbClient.sendToOpponent({
+				"action" : "Destroy",
+				"uid" : this.uid,
+			});
+		}
+	}
+	
 	moveTo(pile,oppAction,toTop){
 		this.tapped = false;
 		
@@ -130,9 +154,9 @@ class Card{
 	}
 	
 	click(event){
-		if(activeAction=="flip"){
-			this.flip();
-		}else if(activeAction){
+		if(this[activeAction]){
+			this[activeAction]();
+		}else if(this.pile[activeAction]){
 			this.pile[activeAction]();
 		}
 	}

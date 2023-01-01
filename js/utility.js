@@ -8,6 +8,7 @@ function doRequest(url,method="GET",payload={},headers={},callback=console.log){
 	let xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function() {
 		if (this.readyState == 4) {
+			
 			callback(this.responseText);
 		}
 	};

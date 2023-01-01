@@ -1,10 +1,40 @@
 class DBClient{
 
 	constructor(username,password){
+		this.version = 676;
+		
+		this.heartBeatInterval = 30000;
+		this.msgQueueInterval = 100;
+		
+		this.maxMsgSize = 500;
+		
+		this.log = [];
+		
 		this.username = username;
 		this.rawPassword = password;
+		this.msgQueue = [];
 		
 		this.login();
+		/*
+		if(username && password){
+			this.login();
+		}else{
+			this.db_id = localStorage.getItem("db_id");
+			this.relogin();
+		}*/
+	}
+	
+	relogin(){//cant use this due to unsafe header.
+		let payload = { 
+			db_id: this.db_id,
+			version:this.version,
+		};
+		let formData= new URLSearchParams(payload).toString();
+		let headers = {"Content-Type": "application/x-www-form-urlencoded"};
+		doRequest("https://www.duelingbook.com/logged-in.php","POST",formData,headers,(resp)=>{
+			//localStorage.setItem("login",resp);
+			this.processLogin(JSON.parse(resp));
+		});
 	}
 
 	login(){
@@ -37,12 +67,20 @@ class DBClient{
 			alert("Invalid Password");
 			return;
 		}
+		
+		localStorage.setItem("db_id",this.db_id);
 		this.password = data.password;
+		this.username = data.username;
+		
+		player2.setName(this.username);
+		//$('label[for="player2Life"]').text(this.username);
+		
 		this.connect();
 	}
 	
 	
 	send(data){
+		this.lastSend = new Date();
 		this.socket.send(JSON.stringify(data));
 	}
 	
@@ -56,9 +94,36 @@ console.log("sendToOpponent",data);
 			username:this.opponent
 		};
 		
-		//this.messageQueue.push(message);
-
-		this.send(message);
+		if(true){ // maybe allow instant message every X?
+			this.msgQueue.push(data);
+		}else{
+			this.send(message);
+		}
+	}
+	
+	sendQueue(){
+		if(this.msgQueue.length){
+			
+			let message = {
+				action:"Private message",
+				message:"", 
+				username:this.opponent
+			};
+			
+			let msgIndex;
+			
+			for(let i=0;i<this.msgQueue.length;i++){
+				message.message = JSON.stringify(this.msgQueue.slice(0,i+1));
+				if(message.message.length > this.maxMsgSize){
+					break;
+				}else{
+					msgIndex = i;
+				}
+			}
+			message.message = JSON.stringify(this.msgQueue.slice(0,msgIndex+1));
+			this.msgQueue.splice(0,msgIndex+1);
+			this.send(message);
+		}
 	}
 	
 	
@@ -76,7 +141,8 @@ console.log("sendToOpponent",data);
 		});
 		this.socket.onopen = (event)=>{
 			console.log(event);
-			setInterval(()=>{this.keepAlive()},30000);
+			setInterval(()=>{this.keepAlive()},this.heartBeatInterval);
+			setInterval(()=>{this.sendQueue()},this.msgQueueInterval);
 			this.send({
 				"action": "Connect",
 				"username": this.username,
@@ -84,7 +150,7 @@ console.log("sendToOpponent",data);
 				"db_id": "",
 				"session": "",
 				"administrate": false,
-				"version": 676,
+				"version": this.version,
 				"capabilities": "",
 				"remember_me": 1,
 				"connect_time": 0,
@@ -102,7 +168,7 @@ console.log("sendToOpponent",data);
 	connectOpponent(opponent){
 		this.opponent = opponent;
 		player1.setName(opponent);
-		$('label[for="player1Life"]').text(opponent);
+		//$('label[for="player1Life"]').text(opponent);
 		this.sendToOpponent({
 			action : "Start Game",
 			deck : rawDeckList,
@@ -112,11 +178,7 @@ console.log("sendToOpponent",data);
 
 	onData(msg){
 	//	console.log(msg);
-		
-		if(msg.action=="Multiple"){
-			//todo - allow bundeling multiple actions in one go.
-			return;
-		}
+
 		
 		//do whatever here :)
 		if(msg.action == "Connected"){
@@ -128,9 +190,20 @@ console.log("sendToOpponent",data);
 		}else if(msg.action == "Lost connection"){
 			console.log("Lost Connection");
 		}else if(msg.action == "Private message"){
-console.log("onData",msg);			
-			let data = JSON.parse(msg.message);
+			
+			let allData = JSON.parse(msg.message);
 			let sender = msg.username;
+			for(let data of allData){
+				this.onMtgMsg(data,sender);
+			}
+		}
+		
+	}
+	
+	onMtgMsg(data,sender){
+		console.log(sender,data);
+			//let data = JSON.parse(msg.message);
+			//let sender = msg.username;
 			//send these to the "real" event handler, if the username matches the player we are playing.
 			
 			if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
@@ -153,6 +226,9 @@ console.log("onData",msg);
 					}
 					
 					card.moveTo(pile,true,toTop);
+				}else if(data.action=="Clone"){
+					let card = cards[data.uid];
+					card.clone(true);
 				}else if(data.action=="Shuffle"){
 					let pile = piles[data.player][data.pile];
 					pile.setShuffle(JSON.parse(data.order));					
@@ -167,6 +243,9 @@ console.log("onData",msg);
 					if(reveal){
 						pile.scry(number,true);
 					}
+				}else if(data.action=="Untap All"){
+					let pile = piles[data.player][data.pile];
+					pile.untapAll(true);
 				}else if(data.action=="Tapped"){
 					let card = cards[data.uid];
 					card.tapped = data.tapped;
@@ -182,11 +261,6 @@ console.log("onData",msg);
 					player.setLife(value,true);
 				}
 			}
-			
-			
-			
-		}
-		
 	}
 	
 }
