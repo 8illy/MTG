@@ -199,9 +199,18 @@ class Pile{
 		if(this.player){
 			let output = TemplateEngine(pileTemplate,this);
 			this.$.html(output);
+			this.resizeCardsIfOverflow();
 		}
 		if(activePile==this){
 			this.renderViewPile();
+		}
+	}
+	
+	resizeCardsIfOverflow(){
+		if(this.$.prop('scrollHeight') > this.$.height()){
+			this.$.find(".pile").addClass("overflownPile");
+		}else{
+			this.$.find(".pile").removeClass("overflownPile");
 		}
 	}
 	

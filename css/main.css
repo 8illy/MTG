@@ -56,7 +56,7 @@
 }
 
 #cardPreviewContainer {
-    padding-top: 25px;
+    padding-top: 5px;
 }
 
 #cardPreviewContainer > .cardFrame, 
@@ -67,8 +67,16 @@
 .cardImg:not(.largeCardImg) {
     height: 130px;
     width: auto;
+	margin-bottom:5px;
 }
 
+.overflownPile .cardImg{
+	height:60px;
+}
+
+.playerPile {
+    height: 100%;
+}
 
 
 body{
@@ -77,7 +85,7 @@ body{
 #gameControls,
 #lifeCounter{
     border: 1px solid black;
-    padding: 20px;
+    padding: 10px;
     border-radius: 5px;
     background: #eee;
     margin-top: 5px;
@@ -98,7 +106,7 @@ input#scryNumber {
 
 .controlRow > .controlRowInner {
     text-align: right;
-    width: 50%;
+    width: 60%;
     margin: auto;
     margin-left: 10%;
     margin-top: 5px;

@@ -71,8 +71,11 @@ function importDeck(deckFile){
 	let fr=new FileReader();
             
 	fr.onload= ()=>{
-		rawDeckList = fr.result; // bad change this later :)
+		//rawDeckList = fr.result; // bad change this later :)
 		processDeckList(fr.result,player2);
+		
+		$("#opponentForm").show();
+		$("#boardContainer").show();
 	}
           
 	fr.readAsText(deckFile);
@@ -81,7 +84,7 @@ function importDeck(deckFile){
 
 function processDeckList(rawTxt,ownerPlayer){
 	
-	
+	ownerPlayer.rawTxtDecklist = rawTxt;
 	
 	let lines = rawTxt.split("\r\n");
 	lines = lines.filter(function(e){return !!e.trim()});
@@ -115,11 +118,7 @@ function processDeckList(rawTxt,ownerPlayer){
 	doRequest("https://api.scryfall.com/cards/collection","POST",payload,headers,function(resp){
 		createDeck(resp,lines,ownerPlayer);
 		
-		if(ownerPlayer==player2){
-			$("#opponentForm").show();
-		}
 		
-		$("#boardContainer").show();
 	});
 	
 }

@@ -98,6 +98,8 @@ class Card{
 	moveTo(pile,oppAction,toTop){
 		this.tapped = false;
 		
+		let oldPile = this.pile;
+		
 		if(this.pile && this.pile==loadPile){
 			this.player = pile.player;
 			this.generateUID();
@@ -133,7 +135,7 @@ class Card{
 				"pile" : pile.pileClass,
 				"player" : pile.player.player,
 				"toTop" : toTop,
-				"id" : this.cardData.id,//incase we need to load the card data in.
+				"id" : oldPile==loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
 			});
 		}
 		
@@ -178,6 +180,22 @@ console.log(event.button);
 			this.cardData = JSON.parse(resp);
 			this.pile.render();
 		});
+	}
+	
+	keywordIcons(){//leave for now - doesnt look good.
+		let iconList = {
+			"Flying" : {icon : "kiwi-bird", colour: "#f7f7f7"},
+			"Deathtouch" : {icon : "skull", colour: "#000000"},
+			"Haste" : {icon : "fast-forward", colour: "#bb5555"},
+		}
+		
+		let icons = this.cardData.keywords.map((e)=>{
+			return iconList[e];
+		}).filter((e)=>{
+			return !!e;
+		});
+		
+		return TemplateEngine(iconsTemplate,{icons:icons});
 	}
 	
 }

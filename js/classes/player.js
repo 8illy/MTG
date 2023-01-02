@@ -6,6 +6,8 @@ class Player{
 		this.cardUidCount = 1;
 		this.life = 20;
 		
+		this.rawTxtDecklist = "";
+		
 		this.setUpField();
 		
 		piles[this.player] = {};
@@ -28,12 +30,21 @@ class Player{
 		
 	}
 	
-	reset(){
+	reset(oppAction){
 		this.life = 20;
-		for(let pile of this.piles){
-			pile.empty();
+		this.cardUidCount = 1;
+		for(let i in this.piles){
+			this.piles[i].empty();
 		}
-		/*TODO.*/
+		processDeckList(this.rawTxtDecklist,this);
+		this.render();
+		
+		if(!oppAction){
+			dbClient.sendToOpponent({
+				"action" : "Reset",
+				"player" : this.player,
+			});
+		}
 	}
 	
 	get $(){

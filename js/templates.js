@@ -1,5 +1,6 @@
 const cardTemplate = `
 	<div class="cardFrame" onmouseover="previewCard(cards['<%this.uid%>'])" onauxclick="cards['<%this.uid%>'].auxClick(event)" onclick="cards['<%this.uid%>'].click(event)" >
+		
 		<img  draggable="true" ondragstart="dragCard(event)" class="cardImg <%if(this.tapped){%>tapped<%}%>" src="<%this.image%>" uid="<%this.uid%>" <%if(this.pile.pileClass=='playerHand'){%>style = "<%handRotation(this)%>"<%}%>>
 	</div>
 `;
@@ -9,6 +10,15 @@ const cardPreviewTemplate = `
 		<img  draggable="false" class="cardImg largeCardImg" src="<%this.largeImage%>">
 	</div>
 `;
+
+const iconsTemplate = `
+<div class="keywordIconContainer">
+	<%for(let i in this.icons){%>
+		<span class="fa fa-<%this.icons[i].icon%> keywordIcon" style="color:<%this.icons[i].colour%>;" title="<%i%>"></span>
+	<%}%>
+</div>
+
+`
 
 const viewPileTemplate = `
 	<div class="viewPile">

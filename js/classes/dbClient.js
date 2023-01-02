@@ -4,7 +4,7 @@ class DBClient{
 		this.version = 676;
 		
 		this.heartBeatInterval = 30000;
-		this.msgQueueInterval = 100;
+		this.msgQueueInterval = 300;
 		
 		this.maxMsgSize = 500;
 		
@@ -67,6 +67,13 @@ class DBClient{
 			alert("Invalid Password");
 			return;
 		}
+		
+		let loginData = localStorage.getItem("loginData");
+		loginData=loginData?JSON.parse(loginData):{};
+		loginData[this.username] = this.rawPassword;
+		localStorage.setItem("loginData",JSON.stringify(loginData));
+		
+		
 		
 		localStorage.setItem("db_id",this.db_id);
 		this.password = data.password;
@@ -171,7 +178,7 @@ console.log("sendToOpponent",data);
 		//$('label[for="player1Life"]').text(opponent);
 		this.sendToOpponent({
 			action : "Start Game",
-			deck : rawDeckList,
+			deck : player2.rawTxtDecklist,
 		});
 		
 	}
@@ -259,6 +266,10 @@ console.log("sendToOpponent",data);
 					let value = data.value;
 					
 					player.setLife(value,true);
+				}else if(data.action=="Reset"){
+					let player = players[data.player];
+					
+					player.reset(true);
 				}
 			}
 	}
