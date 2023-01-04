@@ -1,10 +1,10 @@
-PILE_DECK = {};
-PILE_CREATURES = {};
-PILE_ARTIFACTS = {};
-PILE_WALKERS = {};
-PILE_LANDS = {};
-PILE_GRAVE = {};
-PILE_EXILE = {};
-PILE_HAND = {};
+PILE_DECK = "Deck";
+PILE_CREATURES = "Creatures";
+PILE_ARTIFACTS = "Artifacts";
+PILE_WALKERS = "Walkers";
+PILE_LANDS = "Lands";
+PILE_GRAVE = "Grave";
+PILE_EXILE = "Exiled";
+PILE_HAND = "Hand";
 
-PILE_GENERIC = {};
+PILE_GENERIC = "Generic";

@@ -1,15 +1,15 @@
 class Pile{
 	
-	constructor(type=PILE_GENERIC,faceUp=false,spread=false,player,pileClass){
+	constructor(type=PILE_GENERIC,faceUp=false,spread=false,player){
 		this.faceUp = faceUp;
 		this.spread = spread;
 		this.type = type;//PILE_DECK
 		this.cards = [];
 		this.player = player;
-		this.pileClass = pileClass;
+		this.pileClass = "player"+this.type;
 
 		if(this.player){
-			piles[this.player.player][this.pileClass] = this;
+			piles[this.player.player][this.type] = this;
 			
 			this.addDropEvent();
 		}
@@ -19,7 +19,7 @@ class Pile{
 	setPlayer(player){
 		console.log(player);
 		this.player = player;
-		piles[this.player.player][this.pileClass?this.pileClass:"generic"] = this;
+		piles[this.player.player][this.type?this.type:"generic"] = this;
 	}
 	
 	get $(){
@@ -102,7 +102,7 @@ class Pile{
 		this.render();
 		dbClient.sendToOpponent({
 			"action" : "Shuffle",
-			"pile" : this.pileClass,
+			"pile" : this.type,
 			"player" : this.player.player,
 			"order" : JSON.stringify(order),
 		});
@@ -128,7 +128,7 @@ class Pile{
 		if(!oppAction){
 			dbClient.sendToOpponent({
 				"action" : "Untap All",
-				"pile" : this.pileClass,
+				"pile" : this.type,
 				"player" : this.player.player,
 			});
 		}
@@ -162,7 +162,7 @@ class Pile{
 		if(!oppAction){
 			dbClient.sendToOpponent({
 				"action" : "Scry",
-				"pile" : this.pileClass,
+				"pile" : this.type,
 				"player" : this.player.player,
 				"number" : num,
 				"reveal" : $("#scryOpponent").prop("checked"),
@@ -174,7 +174,7 @@ class Pile{
 	reveal(){
 		dbClient.sendToOpponent({
 			"action" : "Reveal",
-			"pile" : this.pileClass,
+			"pile" : this.type,
 			"player" : this.player.player,
 		});
 	}
@@ -228,7 +228,7 @@ class Pile{
 		let colour = this.player==player1?player2.colour:player1.colour;
 		dbClient.sendToOpponent({
 			"action" : "Log",
-			"log" : `Viewed ${highlight(this.player.player,colour)}s ${highlight(this.pileClass,"coral")}`,
+			"log" : `Viewed ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
 		
 	}

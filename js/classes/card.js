@@ -132,7 +132,7 @@ class Card{
 			dbClient.sendToOpponent({
 				"action" : "Move To",
 				"uid" : this.uid,
-				"pile" : pile.pileClass,
+				"pile" : pile.type,
 				"player" : pile.player.player,
 				"toTop" : toTop,
 				"id" : this.oldPile==loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
@@ -172,13 +172,16 @@ console.log(event.button);
 		}
 	}
 	
-	loadCard(){
+	loadCard(cb){
 		let headers = {
 			"Content-Type" : "application/json",
 		}
 		doRequest("https://api.scryfall.com/cards/"+this.cardData.id,"GET",{},headers,(resp)=>{
 			this.cardData = JSON.parse(resp);
 			this.pile.render();
+			if(cb){
+				cb();
+			}
 		});
 	}
 	

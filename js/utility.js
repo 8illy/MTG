@@ -133,8 +133,8 @@ function createDeck(resp,decklist,ownerPlayer){
 	ownerPlayer.render();
 }
 
-function previewCard(card){
-	if(card.visible){
+function previewCard(card,forceVisible){
+	if(card.visible||forceVisible){
 		//let output = TemplateEngine(cardPreviewTemplate,card);
 		//$("#cardPreviewContainer").html(output);
 		$("#largeCardImg").width($("#largeCardImg").width());

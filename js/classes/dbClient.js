@@ -239,10 +239,13 @@ console.log("sendToOpponent",data);
 			logMsg = `Started the Game`
 		}else if(data.action=="Move To"){
 			let card = cards[data.uid];//"+cards[card.uid]+")'"
-			logMsg = `Moved ${highlight(card.visible?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(cards['"+card.uid+"'])")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile.pileClass,locationHighlight)}`;
+			let vis = card.visible||(card.oldPile?card.oldPile.faceUp:false);
+			if(card.cardData.name){
+				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
+			}
 		}else if(data.action=="Clone"){
-			let card = cards[data.uid];			
-			logMsg = `Cloned ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")}`;
+			let card = cards[data.uid];		
+			logMsg = `Cloned ${highlight(card.player.player,card.player.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Shuffle"){
 			logMsg = `Shuffled ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Reveal"){
@@ -254,11 +257,11 @@ console.log("sendToOpponent",data);
 			logMsg = `Untapped All in ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Tapped"){
 			let card = cards[data.uid];
-			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")} in ${highlight(data.pile,locationHighlight)}`;
+			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Flip"){
 			let card = cards[data.uid];
 			if(card.visible){
-				logMsg = `Flipped ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")} in ${highlight(data.pile,locationHighlight)}`;
+				logMsg = `Flipped ${highlight(card.player.player,card.player.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
 			}
 		}else if(data.action=="Set Life"){
 			logMsg = `Set ${highlight(data.player,playerHighlight)}s Life to ${data.value}`;
@@ -295,7 +298,7 @@ console.log("sendToOpponent",data);
 					
 					if(!card){
 						card = new Card({id:id},pile.player);
-						card.loadCard();
+						card.loadCard(()=>{this.onMtgMsgLog(data,sender);});
 					}
 					
 					card.moveTo(pile,true,toTop);

@@ -15,16 +15,16 @@ class Player{
 		
 		
 		this.piles = {
-			deck : new Pile(PILE_DECK,false,false,this,"playerDeck"),
-			hand : new Pile(PILE_HAND,true,true,this,"playerHand"),
+			deck : new Pile(PILE_DECK,false,false,this),
+			hand : new Pile(PILE_HAND,true,true,this),
 			
-			grave : new Pile(PILE_GRAVE,true,false,this,"playerGrave"),
-			exile : new Pile(PILE_EXILE,true,false,this,"playerExiled"),
+			grave : new Pile(PILE_GRAVE,true,false,this),
+			exile : new Pile(PILE_EXILE,true,false,this),
 			
-			creatures : new Pile(PILE_CREATURES,true,true,this,"playerCreatures"),
-			artifacts : new Pile(PILE_ARTIFACTS,true,true,this,"playerArtifacts"),
-			walkers : new Pile(PILE_WALKERS,true,true,this,"playerWalkers"),
-			lands : new Pile(PILE_LANDS,true,true,this,"playerLands"),
+			creatures : new Pile(PILE_CREATURES,true,true,this),
+			artifacts : new Pile(PILE_ARTIFACTS,true,true,this),
+			walkers : new Pile(PILE_WALKERS,true,true,this),
+			lands : new Pile(PILE_LANDS,true,true,this),
 		};
 		
 		
