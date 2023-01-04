@@ -8,7 +8,7 @@ class DBClient{
 		
 		this.maxMsgSize = 500;
 		
-		this.log = [];
+		this.logItems = [];
 		
 		this.username = username;
 		this.rawPassword = password;
@@ -21,6 +21,25 @@ class DBClient{
 		}else{
 			this.db_id = localStorage.getItem("db_id");
 			this.relogin();
+		}*/
+	}
+	
+	log(str,player){
+		let log = {
+			msg : str,
+			player : player,
+			time : new Date(),
+		};
+		
+		this.logItems.push(log);
+		
+		$("#logOutput").prepend(TemplateEngine(logTemplate,log))
+		/*
+		if(player==player2){
+			dbClient.sendToOpponent({
+				"action" : "Log",
+				"log" : str,
+			});
 		}*/
 	}
 	
@@ -207,6 +226,53 @@ console.log("sendToOpponent",data);
 		
 	}
 	
+	onMtgMsgLog(data,sender){
+		let senderPlayer = sender==this.opponent?player1:player2;
+		let logMsg = "";
+		
+		let playerHighlight = data.player?players[data.player].colour:player2.colour;//;data.player==this.opponent?"red":"green";
+		
+		let cardHighlight = "blue";
+		let locationHighlight = "coral";
+		
+		if(data.action=="Start Game"){
+			logMsg = `Started the Game`
+		}else if(data.action=="Move To"){
+			let card = cards[data.uid];//"+cards[card.uid]+")'"
+			logMsg = `Moved ${highlight(card.visible?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(cards['"+card.uid+"'])")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile.pileClass,locationHighlight)}`;
+		}else if(data.action=="Clone"){
+			let card = cards[data.uid];			
+			logMsg = `Cloned ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")}`;
+		}else if(data.action=="Shuffle"){
+			logMsg = `Shuffled ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
+		}else if(data.action=="Reveal"){
+			let pile = piles[data.player][data.pile];			
+			logMsg = `Revealed ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
+		}else if(data.action=="Scry"){
+			logMsg = `Scried ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} for ${data.number}`;
+		}else if(data.action=="Untap All"){
+			logMsg = `Untapped All in ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
+		}else if(data.action=="Tapped"){
+			let card = cards[data.uid];
+			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")} in ${highlight(data.pile,locationHighlight)}`;
+		}else if(data.action=="Flip"){
+			let card = cards[data.uid];
+			if(card.visible){
+				logMsg = `Flipped ${highlight(data.player,playerHighlight)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'])")} in ${highlight(data.pile,locationHighlight)}`;
+			}
+		}else if(data.action=="Set Life"){
+			logMsg = `Set ${highlight(data.player,playerHighlight)}s Life to ${data.value}`;
+		}else if(data.action=="Reset"){
+			logMsg = `Reset ${highlight(data.player,playerHighlight)}s Deck`;
+		}else if(data.action=="Log"){
+			logMsg = data.log;
+		}
+		
+		if(logMsg){
+			this.log(logMsg,senderPlayer);
+		}
+	}
+	
 	onMtgMsg(data,sender){
 		console.log(sender,data);
 			//let data = JSON.parse(msg.message);
@@ -233,12 +299,15 @@ console.log("sendToOpponent",data);
 					}
 					
 					card.moveTo(pile,true,toTop);
+					
 				}else if(data.action=="Clone"){
 					let card = cards[data.uid];
 					card.clone(true);
+										
 				}else if(data.action=="Shuffle"){
 					let pile = piles[data.player][data.pile];
-					pile.setShuffle(JSON.parse(data.order));					
+					pile.setShuffle(JSON.parse(data.order));	
+					
 				}else if(data.action=="Reveal"){
 					let pile = piles[data.player][data.pile];
 					pile.viewPile();
@@ -266,11 +335,15 @@ console.log("sendToOpponent",data);
 					let value = data.value;
 					
 					player.setLife(value,true);
+					
 				}else if(data.action=="Reset"){
 					let player = players[data.player];
-					
 					player.reset(true);
 				}
+			}
+			
+			if(sender==this.opponent||sender==this.username){
+				this.onMtgMsgLog(data,sender);
 			}
 	}
 	

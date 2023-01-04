@@ -45,11 +45,11 @@
 			<div id="leftSidebar" class="col-3">
 				<div id="cardPreviewContainer">
 					<div class="cardFrame">
-						<img  draggable="false" class="cardImg largeCardImg" src="./img/cardBack.png">
+						<img  draggable="false" class="cardImg largeCardImg" id="largeCardImg" src="./img/cardBack.png">
 					</div>
 				</div>
 				
-				<div id="lifeCounter">
+				<div id="lifeCounter"  class="sidebarBox">
 					<div id="player1LifeDisplay" class="controlRow">
 						<div class="controlRowInner">
 							<label for="player1Life" class="playerLifeLabel">Player 1</label>
@@ -65,7 +65,7 @@
 						</div>
 					</div>
 				</div>
-				<div id="gameControls">
+				<div id="gameControls" class="sidebarBox">
 				
 					<div class="container"> 
 						<div class="row">
@@ -106,6 +106,10 @@
 					
 					
 					</div>
+				</div>
+				
+				<div id="logSidebarBox"  class="sidebarBox">
+					<div id="logOutput" class="container"></div>
 				</div>
 			</div>
 			<div id="fieldContainer" class="col-9">

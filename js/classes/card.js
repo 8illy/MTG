@@ -98,7 +98,7 @@ class Card{
 	moveTo(pile,oppAction,toTop){
 		this.tapped = false;
 		
-		let oldPile = this.pile;
+		this.oldPile = this.pile;
 		
 		if(this.pile && this.pile==loadPile){
 			this.player = pile.player;
@@ -135,7 +135,7 @@ class Card{
 				"pile" : pile.pileClass,
 				"player" : pile.player.player,
 				"toTop" : toTop,
-				"id" : oldPile==loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
+				"id" : this.oldPile==loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
 			});
 		}
 		

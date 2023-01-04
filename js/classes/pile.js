@@ -224,6 +224,13 @@ class Pile{
 		this.render();
 		$("#pileDisplayModal").modal("show");
 		
+		
+		let colour = this.player==player1?player2.colour:player1.colour;
+		dbClient.sendToOpponent({
+			"action" : "Log",
+			"log" : `Viewed ${highlight(this.player.player,colour)}s ${highlight(this.pileClass,"coral")}`,
+		});
+		
 	}
 	
 }

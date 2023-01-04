@@ -89,13 +89,11 @@ function processDeckList(rawTxt,ownerPlayer){
 	let lines = rawTxt.split("\r\n");
 	lines = lines.filter(function(e){return !!e.trim()});
 	//for now ignore sideboard
-	if(lines.indexOf("SIDEBOARD:")!=-1){
-		lines = lines.slice(0,lines.indexOf("SIDEBOARD:"));
+	let sideboardIndex = lines.findIndex(function(a){return a.match(/sideboard/gi)});
+console.log(sideboardIndex);
+	if(sideboardIndex!=-1){
+		lines = lines.slice(0,sideboardIndex);
 	}	
-	if(lines.indexOf("sideboard")!=-1){
-		lines = lines.slice(0,lines.indexOf("sideboard"));
-	}
-
 	//get quantities & card names
 	lines = lines.map(function(e){
 		let parts = e.split(" ");
@@ -137,8 +135,10 @@ function createDeck(resp,decklist,ownerPlayer){
 
 function previewCard(card){
 	if(card.visible){
-		let output = TemplateEngine(cardPreviewTemplate,card);
-		$("#cardPreviewContainer").html(output);
+		//let output = TemplateEngine(cardPreviewTemplate,card);
+		//$("#cardPreviewContainer").html(output);
+		$("#largeCardImg").width($("#largeCardImg").width());
+		$("#largeCardImg").attr("src",card.largeImage)
 	}
 }
 
@@ -222,4 +222,10 @@ function getCardIndex(a,player){
 		}
 		return uid==a.uidNumber && ( (e<0 && a.player!=player)||(e>0 && a.player==player));
 	}
+}
+
+
+function highlight(str,colour,action){
+	colour=colour?colour:"red";
+	return TemplateEngine(`<span style="color:${colour}" onmouseover="${action}"><%this%></span>`,str);
 }

@@ -26,6 +26,9 @@ function setup(){
 	player1 = new Player(1);//upper
 	player2 = new Player(2);//lower
 	
+	player1.colour = "red";
+	player2.colour="green";
+	
 	player1.lifeDisplay = $('#player1LifeDisplay');
 	player2.lifeDisplay = $('#player2LifeDisplay');
 	

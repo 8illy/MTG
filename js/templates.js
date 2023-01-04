@@ -11,6 +11,14 @@ const cardPreviewTemplate = `
 	</div>
 `;
 
+let logTemplate = `
+	<div class="row logItem">
+		<div class="logDate col-3"><%this.time.toLocaleString("en-UK").split(", ")[1]%></div>
+		<div class="logPlayer col-9" style="color:<%this.player.colour%>;"><%this.player.player%></div>
+		<div class="logMessage col-12"><%this.msg%></div>
+	</div>
+`
+
 const iconsTemplate = `
 <div class="keywordIconContainer">
 	<%for(let i in this.icons){%>

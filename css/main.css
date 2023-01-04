@@ -1,4 +1,4 @@
-.row {
+#fieldContainer .row {
     height: 150px;
 }
 
@@ -82,8 +82,8 @@
 body{
 	background-color:#444!important;
 }
-#gameControls,
-#lifeCounter{
+
+.sidebarBox{
     border: 1px solid black;
     padding: 10px;
     border-radius: 5px;
@@ -148,6 +148,19 @@ div#pileDisplayModal-body {
 
 .viewPile img.cardImg {
     margin-top: 10px;
+}
+
+.logItem:nth-child(2n) {
+    background: #ccc;
+}
+.logMessage,
+.logPlayer{
+    text-align: left;
+}
+
+div#logOutput {
+    height: 300px;
+    overflow-y: scroll;
 }
 
 /********/
