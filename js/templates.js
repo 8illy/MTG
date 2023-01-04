@@ -1,7 +1,19 @@
 const cardTemplate = `
 	<div class="cardFrame" onmouseover="previewCard(cards['<%this.uid%>'])" onauxclick="cards['<%this.uid%>'].auxClick(event)" onclick="cards['<%this.uid%>'].click(event)" >
 		
+		<%TemplateEngine(countersTemplate,this)%>
+		
 		<img  draggable="true" ondragstart="dragCard(event)" class="cardImg <%if(this.tapped){%>tapped<%}%>" src="<%this.image%>" uid="<%this.uid%>" <%if(this.pile.pileClass=='playerHand'){%>style = "<%handRotation(this)%>"<%}%>>
+	</div>
+`;
+
+const countersTemplate = `
+	<div class="cardCountersContainerOuter">
+		<div class="cardCountersContainer">
+			<%for(let i in this.counters){%>
+				<div class="cardCounter" style="background-color:<%i%>"><%this.counters[i]%></div>
+			<%}%>
+		</div>
 	</div>
 `;
 

@@ -1,3 +1,10 @@
+html{
+-webkit-user-select: none; /* Safari */        
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* IE10+/Edge */
+user-select: none; /* Standard */	
+}
+
 #fieldContainer .row {
     height: 150px;
 }
@@ -90,6 +97,29 @@ body{
     background: #eee;
     margin-top: 5px;
     text-align: center;
+	display:none;
+}
+
+.sidebarBoxSelected{
+	display:block;
+}
+
+.sidebarBoxTabStripItem.sidebarBoxTabStripItemSelected{
+	background:green;
+}
+
+.sidebarBoxTabStripItem {
+    display: inline-block;
+    background: #eee;
+    border: 1px solid black;
+    border-radius: 4px;
+    width: 100px;
+    text-align: center;
+    padding: 5px;
+}
+
+div#sidebarBoxTabStrip {
+    margin-top: 10px;
 }
 
 .activeAction{
@@ -159,8 +189,39 @@ div#pileDisplayModal-body {
 }
 
 div#logOutput {
-    height: 300px;
+    height: 250px;
     overflow-y: scroll;
+}
+
+.cardCountersContainerOuter {
+    position: absolute;
+    /*width: 100%;*/
+    display: inline-block;
+	width:100px;
+}
+
+.overflownPile .cardCountersContainerOuter{
+	width:35px;
+}
+
+.cardCountersContainer {
+    position: relative;
+    /*width: 100%;*/
+	display: inline-block;
+}
+
+.cardCounter {
+    display: inline-block;
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+    text-align: center;
+    border-radius: 50%;
+    color: white;
+    border: 1px solid black;
+    margin-right: 5px;
+	margin-bottom: 5px;
+    position: relative;
 }
 
 /********/

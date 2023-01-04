@@ -8,6 +8,8 @@ let activeAction = undefined;
 let scryPile = undefined;
 let loadPile = undefined;
 
+let actionParam = "red";
+
 function host(){
 	let username = $("#dbOpponent").val();
 	dbClient.connectOpponent(username);
@@ -57,6 +59,20 @@ $(document).ready(()=>{
 	}else{
 		$("#dbUserSelector").hide();
 	}
+	
+/*	$(".sidebarBox").hide(); */
+	
+	$("#sidebarBoxTabStrip > .sidebarBoxTabStripItem").click(function(){
+		let selClass="sidebarBoxTabStripItemSelected";
+		$("."+selClass).removeClass(selClass);
+		$(this).addClass(selClass);
+		
+		let selBoxClass="sidebarBoxSelected";
+		$("."+selBoxClass).removeClass(selBoxClass);
+		$($(this).attr("tabContent")).addClass(selBoxClass);
+	});
+	
+	$("#sidebarBoxTabStrip > .sidebarBoxTabStripItem").eq(0).click();
 	
 	/*if(localStorage.getItem("db_id")){
 		setup();

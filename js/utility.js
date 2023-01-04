@@ -150,6 +150,12 @@ function setAction(a,elem){
 	}
 }
 
+function setActionParam(promptText,a){
+	if(activeAction==a){
+		actionParam = prompt(promptText);
+	}
+}
+
 function handRotation(card){
 	let cards = card.pile.cards;
 	let items = cards.length;

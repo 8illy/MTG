@@ -10,6 +10,9 @@ class Card{
 		
 		this.face = 0;
 		
+		this.counters = {};
+		this.counterTimers = {};
+		
 		this.generateUID();
 		
 	}
@@ -71,6 +74,44 @@ class Card{
 		
 	}
 	
+	addCounter(){
+		this.incrementCounter(1);
+	}
+	
+	removeCounter(){
+		this.incrementCounter(-1)
+	}
+	
+	incrementCounter(inc){
+		if(this.pile.spread && this.pile.type!=PILE_HAND){
+			this.counters[actionParam] = this.counters[actionParam]?this.counters[actionParam]:0;
+			this.counters[actionParam]+=inc;
+			this.syncCounters(actionParam);
+			this.pile.render();
+		}
+	}
+	
+	syncCounters(counterColourRaw){
+		counterColour = counterColourRaw.toLowerCase();
+		if(this.counterTimers[counterColour]){
+			clearTimeout(this.counterTimers[counterColour]);
+		}
+		this.counterTimers[counterColour] = setTimeout(()=>{
+			this.sendCounters(counterColour)
+		},500);
+	}
+	
+	sendCounters(counterColour){
+		dbClient.sendToOpponent({
+			"action" : "Counters",
+			"uid" : this.uid,
+			"colour" : counterColour,
+			"counters" : this.counters[counterColour],
+		});
+	}
+	
+	
+	
 	clone(oppAction){
 		this.pile.addCard(clone(this.cardData));
 		this.pile.render();		
@@ -97,6 +138,10 @@ class Card{
 	
 	moveTo(pile,oppAction,toTop){
 		this.tapped = false;
+		
+		if(!pile.spread || pile.type == PILE_HAND){
+			this.counters = {};
+		}
 		
 		this.oldPile = this.pile;
 		
