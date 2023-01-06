@@ -149,7 +149,7 @@ class Pile{
 	scry(num,oppAction){
 		num = num?num:$("#scryNumber").val();
 		if(num){
-			scryPile = new Pile();
+			scryPile = new Pile(PILE_GENERIC,false,false,this.player);
 			scryPile.cards = this.cards.slice(0,num);
 			for(let card of scryPile.cards){
 				card.scryPile = scryPile;
