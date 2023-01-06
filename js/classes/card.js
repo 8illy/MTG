@@ -92,7 +92,9 @@ class Card{
 	}
 	
 	syncCounters(counterColourRaw){
-		counterColour = counterColourRaw.toLowerCase();
+console.log(counterColourRaw);
+		let counterColour = counterColourRaw.toLowerCase();
+console.log(counterColour)
 		if(this.counterTimers[counterColour]){
 			clearTimeout(this.counterTimers[counterColour]);
 		}
