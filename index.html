@@ -56,9 +56,19 @@
 					<div class="sidebarBoxTabStripItem" tabContent="#logSidebarBox">
 						Logs
 					</div>
+					<div class="sidebarBoxTabStripItem" tabContent="#pileSidebarBox">
+						Pile
+					</div>
 				</div>
 				
 			
+				<div id="pileSidebarBox"  class="sidebarBox">
+					<button onclick="activePile.stopViewingPile()">Stop Viewing</button>
+					<div id="viewPileContainer">
+					
+					</div>
+				</div>
+				
 				<div id="lifeCounter"  class="sidebarBox">
 					<div id="player1LifeDisplay" class="controlRow">
 						<div class="controlRowInner">
@@ -140,24 +150,7 @@
 		</div>
 		
 		
-		<div class="modal" tabindex="-1" role="dialog" id="pileDisplayModal">
-			<div class="modal-dialog" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Viewing Pile</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal();">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body" id="pileDisplayModal-body">
-						
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal();">Close</button>
-					</div>
-				</div>
-			</div>
-		</div>
+
 	
 	</body>
 </html>

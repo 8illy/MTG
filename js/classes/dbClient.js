@@ -3,8 +3,12 @@ class DBClient{
 	constructor(username,password){
 		this.version = 676;
 		
+		this.messageNumber = 0;
+		
 		this.heartBeatInterval = 30000;
 		this.msgQueueInterval = 300;
+		this.msgQueueLostInterval = 1000;
+		this.msgQueueLostTimeout = 1500;
 		
 		this.maxMsgSize = 500;
 		
@@ -12,7 +16,11 @@ class DBClient{
 		
 		this.username = username;
 		this.rawPassword = password;
-		this.msgQueue = [];
+		
+		
+		this.msgQueue = [];//messages yet to be sent
+		this.msgCache = {};//messages failed to sent, to be resent
+		this.receivedMessages = {};//messages received (only id)
 		
 		this.login();
 		/*
@@ -112,7 +120,6 @@ class DBClient{
 	
 	//may need to add to a queue to prevent too many going at once here.
 	sendToOpponent(data){
-console.log("sendToOpponent",data);
 
 		let message = {
 			action:"Private message",
@@ -123,12 +130,14 @@ console.log("sendToOpponent",data);
 		if(true){ // maybe allow instant message every X?
 			this.msgQueue.push(data);
 		}else{
-			this.send(message);
+			//this.send(message);
 		}
 	}
 	
 	sendQueue(){
 		if(this.msgQueue.length){
+			
+			this.messageNumber++;
 			
 			let message = {
 				action:"Private message",
@@ -139,15 +148,28 @@ console.log("sendToOpponent",data);
 			let msgIndex;
 			
 			for(let i=0;i<this.msgQueue.length;i++){
-				message.message = JSON.stringify(this.msgQueue.slice(0,i+1));
+				message.message = JSON.stringify({
+					data : this.msgQueue.slice(0,i+1),
+					msgId : this.messageNumber,
+				});
 				if(message.message.length > this.maxMsgSize){
 					break;
 				}else{
 					msgIndex = i;
 				}
 			}
-			message.message = JSON.stringify(this.msgQueue.slice(0,msgIndex+1));
+			message.message = JSON.stringify({
+				data : this.msgQueue.slice(0,msgIndex+1),
+				msgId : this.messageNumber,
+			});
 			this.msgQueue.splice(0,msgIndex+1);
+			
+			this.msgCache[this.messageNumber] = {
+				msgId : this.messageNumber,
+				msg : message,
+				time : new Date(),
+			}
+			
 			this.send(message);
 		}
 	}
@@ -166,9 +188,10 @@ console.log("sendToOpponent",data);
 			this.onData(JSON.parse(event.data));
 		});
 		this.socket.onopen = (event)=>{
-			console.log(event);
+
 			setInterval(()=>{this.keepAlive()},this.heartBeatInterval);
 			setInterval(()=>{this.sendQueue()},this.msgQueueInterval);
+			setInterval(()=>{this.queueLostMessages()},this.msgQueueLostInterval);
 			this.send({
 				"action": "Connect",
 				"username": this.username,
@@ -202,13 +225,36 @@ console.log("sendToOpponent",data);
 		
 	}
 
+	confirmMessageSent(msgId){
+		delete this.msgCache[msgId];
+	}
+	
+	confirmMessageReceived(msgId){
+		this.receivedMessages[msgId] = true;
+	}
+	
+	queueLostMessages(){
+		let msgsToSend = Object.values(this.msgCache).filter((e)=>{
+			return e.time.getTime() + this.msgQueueLostTimeout < new Date();//get all that were longer than 3 seconds ago.
+		});
+				
+		for(let data of msgsToSend){
+	
+			let msgs = JSON.parse(data.msg.message)
+			
+			for(let msg of msgs.data){
+				this.msgQueue.push(msg);
+			}
+			
+			delete this.msgCache[data.msgId];
+		}
+	}
+
 	onData(msg){
-	//	console.log(msg);
 
 		
 		//do whatever here :)
 		if(msg.action == "Connected"){
-			console.log("Connected");
 			
 			$("#loginForm").hide();
 			$("#deckInput").show();
@@ -216,12 +262,37 @@ console.log("sendToOpponent",data);
 		}else if(msg.action == "Lost connection"){
 			console.log("Lost Connection");
 		}else if(msg.action == "Private message"){
-			
+
 			let allData = JSON.parse(msg.message);
+
 			let sender = msg.username;
-			for(let data of allData){
-				this.onMtgMsg(data,sender);
+			
+
+			
+			if(!this.opponent || (sender==this.opponent && !this.receivedMessages[allData.msgId]) || sender==this.username){
+				for(let data of allData.data){
+					
+					if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
+						this.connectOpponent(sender);//send them our decklist
+					}
+					
+					if(sender==this.opponent){
+						this.onMtgMsg(data,sender);
+					}
+					
+					this.onMtgMsgLog(data,sender);
+				}
+				
+				if(sender==this.username){
+					this.confirmMessageSent(allData.msgId);
+				}else{
+					this.confirmMessageReceived(allData.msgId);
+				}
+				
 			}
+				
+				
+			
 		}
 		
 	}
@@ -282,14 +353,6 @@ console.log("sendToOpponent",data);
 	}
 	
 	onMtgMsg(data,sender){
-		console.log(sender,data);
-			//let data = JSON.parse(msg.message);
-			//let sender = msg.username;
-			//send these to the "real" event handler, if the username matches the player we are playing.
-			
-			if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
-				this.connectOpponent(sender);//send them our decklist
-			}
 			
 			if(sender==this.opponent){
 				if(data.action=="Start Game"){
@@ -353,10 +416,7 @@ console.log("sendToOpponent",data);
 					player.reset(true);
 				}
 			}
-			
-			if(sender==this.opponent||sender==this.username){
-				this.onMtgMsgLog(data,sender);
-			}
+
 	}
 	
 }

@@ -149,7 +149,7 @@ class Pile{
 	scry(num,oppAction){
 		num = num?num:$("#scryNumber").val();
 		if(num){
-			scryPile = new Pile(PILE_GENERIC,false,false,this.player);
+			let scryPile = new Pile(PILE_GENERIC,false,false,this.player);
 			scryPile.cards = this.cards.slice(0,num);
 			for(let card of scryPile.cards){
 				card.scryPile = scryPile;
@@ -216,14 +216,14 @@ class Pile{
 	
 	renderViewPile(){
 		let output = TemplateEngine(viewPileTemplate,this);
-		$("#pileDisplayModal-body").html(output);
+		$("#viewPileContainer").html(output);
 	}
 	
 	viewPile(){
 		activePile = this;
 		this.render();
-		$("#pileDisplayModal").modal("show");
-		
+		//$("#pileDisplayModal").modal("show");
+		$("[tabContent='#pileSidebarBox']").click();
 		
 		let colour = this.player==player1?player2.colour:player1.colour;
 		dbClient.sendToOpponent({
@@ -231,6 +231,24 @@ class Pile{
 			"log" : `Viewed ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
 		
+	}
+	
+	stopViewingPile(){
+		activePile = undefined;
+		$("#viewPileContainer").html("");
+		if(this.type==PILE_GENERIC){
+			this.empty();
+			this.parentPile.render();
+			//delete this;
+		}else{
+			this.render();
+		}
+		
+		let colour = this.player==player1?player2.colour:player1.colour;
+		dbClient.sendToOpponent({
+			"action" : "Log",
+			"log" : `Stopped Viewing ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
+		});
 	}
 	
 }

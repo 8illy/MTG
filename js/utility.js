@@ -181,17 +181,7 @@ function startingHands(){
 	for(var i=0;i<7;i++){player2.draw();player1.draw();}
 }
 
-function closeModal(){
-	$("#pileDisplayModal").modal("hide");
-	let oldActivePile = activePile;
-	if(scryPile){
-		scryPile.empty();
-		scryPile.parentPile.render();
-		delete scryPile;
-	}
-	activePile = undefined;
-	oldActivePile.render();
-}
+
 
 function clone(arr){
 	return JSON.parse(JSON.stringify(arr));
