@@ -100,6 +100,7 @@ class Pile{
 		//todo - if opps card is in hand send its uid as negative, and detect this in setshuffle.
 		
 		this.render();
+		this.animateShuffle();
 		dbClient.sendToOpponent({
 			"action" : "Shuffle",
 			"pile" : this.type,
@@ -107,6 +108,15 @@ class Pile{
 			"order" : JSON.stringify(order),
 		});
 		
+	}
+	
+	animateShuffle(){
+		let elem = this.$.find(".cardImg");
+		if(elem.length && this.type==PILE_DECK){
+			elem.css("transition-duration","0s").css("transform","rotate(0deg)");setTimeout(()=>{
+				elem.css("transition-duration","1.5s").css("transform","rotate(360deg)");
+			},0);
+		}
 	}
 		
 	setShuffle(order){
@@ -117,6 +127,7 @@ class Pile{
 			return indexA-indexB;
 		});
 		this.render();
+		this.animateShuffle();
 	}
 	
 	untapAll(oppAction){

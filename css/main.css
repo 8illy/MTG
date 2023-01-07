@@ -7,10 +7,15 @@ user-select: none; /* Standard */
 	--mtg-bg-colour : #444;
 	--mtg-fg-colour : #7f7f7f;
 	--mtg-input-colour : #9e9e9e;
+	--mtg-selected-colour : green;
 }
 
 #fieldContainer .row {
     height: 150px;
+}
+
+.playerPile.playerDeck .cardImg {
+    transition-property: transform;
 }
 
 .playerHand{
@@ -113,7 +118,7 @@ input, button {
 }
 
 .sidebarBoxTabStripItem.sidebarBoxTabStripItemSelected{
-	background:green;
+	background:var(--mtg-selected-colour);
 }
 
 #viewPileContainer {
@@ -135,7 +140,7 @@ div#sidebarBoxTabStrip {
 }
 
 .activeAction{
-	background:green;
+	background:var(--mtg-selected-colour)!important;
 }
 
 input#scryNumber {
