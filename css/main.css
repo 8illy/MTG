@@ -52,7 +52,7 @@ user-select: none; /* Standard */
 }
 
 .playerHand img.cardImg {
-    transform-origin: bottom;
+    transform-origin: center;
 }
 
 #boardContainer {

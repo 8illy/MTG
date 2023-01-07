@@ -112,7 +112,7 @@ class Pile{
 	
 	animateShuffle(){
 		let elem = this.$.find(".cardImg");
-		if(elem.length && this.type==PILE_DECK){
+		if(elem.length && (this.type==PILE_DECK ||this.type==PILE_HAND)){
 			elem.css("transition-duration","0s").css("transform","rotate(0deg)");setTimeout(()=>{
 				elem.css("transition-duration","1.5s").css("transform","rotate(360deg)");
 			},0);
