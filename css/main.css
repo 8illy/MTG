@@ -10,6 +10,27 @@ user-select: none; /* Standard */
 	--mtg-selected-colour : green;
 }
 
+
+#loadingContainer{
+    position: absolute;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--mtg-fg-colour);
+    z-index: 8888;
+    opacity: 50%;
+}
+
+#loadingSpinner{
+    width: 20vw;
+    height: 20vw;
+    margin: auto;
+    position: relative;
+    display: block;
+    margin-top: 20vh;
+    z-index: 888888;
+	border-width:20px;
+}
+
 #fieldContainer .row {
     height: 150px;
 }

@@ -52,6 +52,53 @@ class Pile{
 	}
 	
 	
+	//cardsToLoad = [{name:name,quantity:quantity},]
+	loadCards(cardsToLoad,cb){
+		
+		let apiCardLimit = 75;
+		
+		if(cardsToLoad.length <=apiCardLimit){
+			this.loadCardsFromAPI(cardsToLoad,cb);
+		}else{
+			let cardLists = chunk(cardsToLoad,apiCardLimit);
+			let promises = [];
+			for(let i in cardLists){
+				let pr = $.Deferred();
+				promises.push(pr);
+				this.loadCardsFromAPI(cardLists[i],()=>{pr.resolve();});
+			}
+			$.when(...promises).then( cb );
+		}
+	}
+	
+	loadCardsFromAPI(cardsToLoad,cb){
+		let payload = JSON.stringify({
+			"identifiers": cardsToLoad,
+		});
+	
+		let headers = {
+			"Content-Type" : "application/json",
+		}
+		
+		doRequest("https://api.scryfall.com/cards/collection","POST",payload,headers,(resp)=>{
+			let allCardData = JSON.parse(resp).data;
+			
+			for(let card of cardsToLoad){
+				let cardData = allCardData.find((e)=>{return e.name ==card.name});
+				for(let i = 0;i<card.quantity;i++){
+					this.addCard(cardData);
+				}
+			}
+			
+			if(cb){
+				cb();
+			}
+			
+		});
+	}
+	
+	
+	
 	getOrCreateCard(input){
 		//card id or card object to card object
 		if(input instanceof Card){
@@ -235,7 +282,7 @@ class Pile{
 		this.render();
 		//$("#pileDisplayModal").modal("show");
 		$("[tabContent='#pileSidebarBox']").click();
-		
+		$("[tabContent='#pileSidebarBox'] > .fa").show();
 		let colour = this.player==player1?player2.colour:player1.colour;
 		dbClient.sendToOpponent({
 			"action" : "Log",
@@ -245,6 +292,7 @@ class Pile{
 	}
 	
 	stopViewingPile(){
+		$("[tabContent='#pileSidebarBox'] > .fa").hide();
 		activePile = undefined;
 		$("#viewPileContainer").html("");
 		if(this.type==PILE_GENERIC){

@@ -21,8 +21,13 @@
 	
 	<body>
 	
+		<div id="loadingContainer" style="display:none">
+			<div id="loadingSpinner" class="spinner-border" role="status">
+				<span class="sr-only">Loading...</span>
+			</div>
+		</div>
 		
-	
+		
 		<div id="loginForm">
 			<div>
 				<input type="text" name="dbUser" id="dbUser">
@@ -57,7 +62,7 @@
 						Logs
 					</div>
 					<div class="sidebarBoxTabStripItem" tabContent="#pileSidebarBox">
-						Pile
+						Pile <span class="fa fa-exclamation-circle" style="color:black;display:none;"></span>
 					</div>
 				</div>
 				

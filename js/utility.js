@@ -3,6 +3,18 @@ function dragCard(ev) {
 	ev.dataTransfer.setData("selectedCard", uid);
 }
 
+function chunk (arr, len) {
+
+  var chunks = [],
+      i = 0,
+      n = arr.length;
+
+  while (i < n) {
+    chunks.push(arr.slice(i, i += len));
+  }
+
+  return chunks;
+}
 
 function doRequest(url,method="GET",payload={},headers={},callback=console.log){
 	let xhr = new XMLHttpRequest();
@@ -83,8 +95,7 @@ function importDeck(deckFile){
 
 
 function processDeckList(rawTxt,ownerPlayer){
-	
-	ownerPlayer.rawTxtDecklist = rawTxt;
+	//ownerPlayer.rawTxtDecklist = rawTxt;//outdated, as will change this for commander
 	
 	let lines = rawTxt.split("\r\n");
 	lines = lines.filter(function(e){return !!e.trim()});
@@ -103,35 +114,11 @@ console.log(sideboardIndex);
 		}
 	});
 	
-	//build the request for scryfall
+	ownerPlayer.originalDeckList = lines;
 	
-	let payload = JSON.stringify({
-		"identifiers": lines,
-	});
-	
-	let headers = {
-		"Content-Type" : "application/json",
-	}
-	
-	doRequest("https://api.scryfall.com/cards/collection","POST",payload,headers,function(resp){
-		createDeck(resp,lines,ownerPlayer);
-		
-		
-	});
-	
+	ownerPlayer.piles.deck.loadCards(lines,()=>{ownerPlayer.render();});
 }
 
-function createDeck(resp,decklist,ownerPlayer){
-	let allCardData = JSON.parse(resp).data;
-
-	for(let card of decklist){
-		let cardData = allCardData.find(function(e){return e.name ==card.name});
-		for(let i = 0;i<card.quantity;i++){
-			ownerPlayer.piles.deck.addCard(cardData);
-		}
-	}
-	ownerPlayer.render();
-}
 
 function previewCard(card,forceVisible){
 	if(card.visible||forceVisible){

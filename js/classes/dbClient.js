@@ -216,12 +216,59 @@ class DBClient{
 	
 	connectOpponent(opponent){
 		this.opponent = opponent;
-		player1.setName(opponent);
-		//$('label[for="player1Life"]').text(opponent);
-		this.sendToOpponent({
-			action : "Start Game",
-			deck : player2.rawTxtDecklist,
+		player1.setName(opponent);		
+		
+		$("#loadingContainer").show();
+		
+		let deck = player2.originalDeckList.map((e)=>{
+			return {
+				q:e.quantity,
+				n:e.name,
+			}
 		});
+		
+		let startGamePayload = {
+			action : "Start Game",
+			deck : "",
+			count : 0,
+			order : 0,
+		};
+		
+		let firstCardIndex = 0;
+		let lastCardIndex = 0;
+		
+		let messages = [];
+		let prev = "";
+		//limit is 500 characters.
+		for(let i=0;i<deck.length;i++){
+			startGamePayload.deck = JSON.stringify(deck.slice(firstCardIndex,i+1));
+			
+			let dummyMsg = {
+				data : JSON.stringify([startGamePayload]),
+				msgId : this.messageNumber,
+			}
+			
+			if(JSON.stringify(dummyMsg).length > this.maxMsgSize){
+				firstCardIndex = i;
+				messages.push(prev);
+				
+				if(i==deck.length-1){
+					startGamePayload.deck = JSON.stringify(deck.slice(firstCardIndex,i+1));
+					messages.push(startGamePayload);
+				}
+				
+			}else if(i==deck.length-1){
+				messages.push(startGamePayload);
+			}else{
+				prev = clone(startGamePayload)
+			}
+		}
+		
+		for(let i in messages){
+			messages[i].order = i;
+			messages[i].count = messages.length;
+			this.sendToOpponent(messages[i]);
+		}
 		
 	}
 
@@ -328,7 +375,7 @@ class DBClient{
 			logMsg = `Untapped All in ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Tapped"){
 			let card = cards[data.uid];
-			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
+			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)}`;
 		}else if(data.action=="Flip"){
 			let card = cards[data.uid];
 			if(card.visible){
@@ -356,7 +403,20 @@ class DBClient{
 			
 			if(sender==this.opponent){
 				if(data.action=="Start Game"){
-					processDeckList(data.deck,player1);
+console.log(data);
+					//processDeckList(data.deck,player1);
+					let lines = JSON.parse(data.deck).map((e)=>{
+						return {
+							name : e.n,
+							quantity : e.q,
+						}
+					});
+					
+					player1.deckCache[data.order] = lines;
+					if(Object.keys(player1.deckCache).length == data.count){
+						player1.loadDeck();
+					}
+
 					$("#opponentForm").hide();
 				}else if(data.action=="Move To"){
 					let card = cards[data.uid];

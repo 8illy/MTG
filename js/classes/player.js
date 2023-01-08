@@ -28,6 +28,14 @@ class Player{
 		};
 		
 		
+		this.deckCache = [];
+		
+		
+	}
+	
+	loadDeck(){
+		this.originalDeckList = [].concat(...this.deckCache);//todo.
+		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
 	}
 	
 	reset(oppAction){
@@ -36,7 +44,7 @@ class Player{
 		for(let i in this.piles){
 			this.piles[i].empty();
 		}
-		processDeckList(this.rawTxtDecklist,this);
+		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
 		this.render();
 		
 		if(!oppAction){
