@@ -134,6 +134,9 @@ function setAction(a,elem){
 	$(".activeAction").removeClass("activeAction");
 	if(activeAction){
 		$(elem).addClass("activeAction");
+		$("[tabContent='#gameControls'] > .fa").show();
+	}else{
+		$("[tabContent='#gameControls'] > .fa").hide();
 	}
 }
 
@@ -211,4 +214,21 @@ function getCardIndex(a,player){
 function highlight(str,colour,action){
 	colour=colour?colour:"red";
 	return TemplateEngine(`<span style="color:${colour}" onmouseover="${action}"><%this%></span>`,str);
+}
+
+function rollDice(d){
+	let result = Math.ceil(Math.random() * d);
+	dbClient.sendToOpponent({
+		"action" : "Dice",
+		"dice" : d,
+		"result" : result,
+	});
+}
+
+function flipCoin(){
+	let result = Math.ceil(Math.random() * 2);
+	dbClient.sendToOpponent({
+		"action" : "Coin",
+		"result" : result,
+	});
 }

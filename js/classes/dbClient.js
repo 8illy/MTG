@@ -392,6 +392,10 @@ class DBClient{
 			logMsg = `Reset ${highlight(data.player,playerHighlight)}s Deck`;
 		}else if(data.action=="Log"){
 			logMsg = data.log;
+		}else if(data.action=="Coin"){
+			logMsg = `Flipped a coin and Landed on ${highlight(data.result==1?"Heads":"Tails",locationHighlight)}`;
+		}else if(data.action=="Dice"){
+			logMsg = `Rolled a d${data.dice} and Landed on ${highlight(data.result,locationHighlight)}`;
 		}
 		
 		if(logMsg){

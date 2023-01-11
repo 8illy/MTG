@@ -283,6 +283,7 @@ class Pile{
 		//$("#pileDisplayModal").modal("show");
 		$("[tabContent='#pileSidebarBox']").click();
 		$("[tabContent='#pileSidebarBox'] > .fa").show();
+		$("#stopViewingBtn").show();
 		let colour = this.player==player1?player2.colour:player1.colour;
 		dbClient.sendToOpponent({
 			"action" : "Log",
@@ -293,6 +294,7 @@ class Pile{
 	
 	stopViewingPile(){
 		$("[tabContent='#pileSidebarBox'] > .fa").hide();
+		$("#stopViewingBtn").hide();
 		activePile = undefined;
 		$("#viewPileContainer").html("");
 		if(this.type==PILE_GENERIC){

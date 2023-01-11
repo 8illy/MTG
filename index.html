@@ -55,7 +55,7 @@
 					</div>
 					
 					<div class="sidebarBoxTabStripItem" tabContent="#gameControls">
-						Actions
+						Actions <span class="fa fa-exclamation-circle" style="color:black;display:none;"></span>
 					</div>
 					
 					<div class="sidebarBoxTabStripItem" tabContent="#logSidebarBox">
@@ -68,7 +68,7 @@
 				
 			
 				<div id="pileSidebarBox"  class="sidebarBox">
-					<button onclick="activePile.stopViewingPile()">Stop Viewing</button>
+					<button onclick="activePile.stopViewingPile()" id="stopViewingBtn" style="display:none;">Stop Viewing</button>
 					<div id="viewPileContainer">
 					
 					</div>
@@ -140,7 +140,14 @@
 								<button onclick="setAction('removeCounter',this);setActionParam('Colour','removeCounter');">Remove Counter</button>
 							</div>
 						</div>
-					
+						<div class="row">
+							<div class="col-6">
+								<button onclick="rollDice(6);">Dice</button>
+							</div>
+							<div class="col-6">
+								<button onclick="flipCoin();">Coin</button>
+							</div>
+						</div>
 					
 					</div>
 				</div>
@@ -150,7 +157,7 @@
 				</div>
 			</div>
 			<div id="fieldContainer" class="col-9">
-			
+				
 			</div>
 		</div>
 		
