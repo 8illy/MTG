@@ -84,7 +84,11 @@ class Pile{
 			let allCardData = JSON.parse(resp).data;
 			
 			for(let card of cardsToLoad){
-				let cardData = allCardData.find((e)=>{return e.name ==card.name});
+				let cardData = allCardData.find((e)=>{
+					let names = e.name.split(/ \/\/ /g);
+					return e.name ==card.name || names.indexOf(card.name)!=-1;
+					
+				});
 				for(let i = 0;i<card.quantity;i++){
 					this.addCard(cardData);
 				}
