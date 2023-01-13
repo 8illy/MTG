@@ -7,7 +7,8 @@ class Pile{
 		this.cards = [];
 		this.player = player;
 		this.pileClass = "player"+this.type;
-
+		this.cardloadCache = [];
+		
 		if(this.player){
 			piles[this.player.player][this.type] = this;
 			
@@ -58,20 +59,28 @@ class Pile{
 		let apiCardLimit = 75;
 		
 		if(cardsToLoad.length <=apiCardLimit){
-			this.loadCardsFromAPI(cardsToLoad,cb);
+			this.cardloadCache = [];
+			this.loadCardsFromAPI(cardsToLoad,()=>{
+				this.addLoadCards(cardsToLoad);
+				cb();
+			});
 		}else{
 			let cardLists = chunk(cardsToLoad,apiCardLimit);
 			let promises = [];
+			this.cardloadCache = [];
 			for(let i in cardLists){
 				let pr = $.Deferred();
 				promises.push(pr);
-				this.loadCardsFromAPI(cardLists[i],()=>{pr.resolve();});
+				this.loadCardsFromAPI(cardLists[i],i,()=>{pr.resolve();});
 			}
-			$.when(...promises).then( cb );
+			$.when(...promises).then(()=>{
+				this.addLoadCards(cardsToLoad);
+				cb();
+			} );
 		}
 	}
 	
-	loadCardsFromAPI(cardsToLoad,cb){
+	loadCardsFromAPI(cardsToLoad,index,cb){
 		let payload = JSON.stringify({
 			"identifiers": cardsToLoad,
 		});
@@ -82,23 +91,27 @@ class Pile{
 		
 		doRequest("https://api.scryfall.com/cards/collection","POST",payload,headers,(resp)=>{
 			let allCardData = JSON.parse(resp).data;
-			
-			for(let card of cardsToLoad){
-				let cardData = allCardData.find((e)=>{
-					let names = e.name.split(/ \/\/ /g);
-					return e.name ==card.name || names.indexOf(card.name)!=-1;
-					
-				});
-				for(let i = 0;i<card.quantity;i++){
-					this.addCard(cardData);
-				}
-			}
+			this.cardloadCache[index] = allCardData;
 			
 			if(cb){
 				cb();
 			}
 			
 		});
+	}
+	
+	addLoadCards(cardsToLoad){
+		let allCardData = [].concat(...this.cardloadCache);
+		for(let card of cardsToLoad){
+			let cardData = allCardData.find((e)=>{
+				let names = e.name.split(/ \/\/ /g);
+				return e.name ==card.name || names.indexOf(card.name)!=-1;
+				
+			});
+			for(let i = 0;i<card.quantity;i++){
+				this.addCard(cardData);
+			}
+		}
 	}
 	
 	
