@@ -97,7 +97,7 @@ function importDeck(deckFile){
 function processDeckList(rawTxt,ownerPlayer){
 	//ownerPlayer.rawTxtDecklist = rawTxt;//outdated, as will change this for commander
 	
-	let lines = rawTxt.split("\r\n");
+	let lines = rawTxt.split(/\r?\n/);
 	let sideLines = [];
 	lines = lines.filter(function(e){return !!e.trim()});
 	//for now ignore sideboard
@@ -128,7 +128,9 @@ console.log(sideboardIndex);
 	ownerPlayer.originalSideDeckList = sideLines;
 	
 	ownerPlayer.piles.deck.loadCards(lines,()=>{ownerPlayer.render();});
-	ownerPlayer.piles.side.loadCards(sideLines,()=>{ownerPlayer.render();});
+	if(sideLines.length){
+		ownerPlayer.piles.side.loadCards(sideLines,()=>{ownerPlayer.render();});
+	}
 }
 
 
