@@ -98,6 +98,7 @@ function processDeckList(rawTxt,ownerPlayer){
 	//ownerPlayer.rawTxtDecklist = rawTxt;//outdated, as will change this for commander
 	
 	let lines = rawTxt.split("\r\n");
+	let sideLines = [];
 	lines = lines.filter(function(e){return !!e.trim()});
 	//for now ignore sideboard
 	let sideboardIndex = lines.findIndex(function(a){return a.match(/sideboard/gi)});

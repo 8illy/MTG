@@ -275,6 +275,14 @@ class Pile{
 	renderViewPile(){
 		let output = TemplateEngine(viewPileTemplate,this);
 		$("#viewPileContainer").html(output);
+		
+		$("#viewPileContainer").on('dragover', false).on('drop',(ev)=>{	
+			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
+			let card = cards[uid];
+			this.handleDrop(card);
+			return false;
+		});
+		
 	}
 	
 	viewPile(){

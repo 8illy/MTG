@@ -42,7 +42,7 @@ class Player{
 	
 	loadSideDeck(){
 		this.originalSideDeckList = [].concat(...this.sideDeckCache);//todo.
-		this.piles.deck.loadCards(this.originalSideDeckList,()=>{});
+		this.piles.side.loadCards(this.originalSideDeckList,()=>{});
 	}
 	
 	reset(oppAction){
@@ -52,6 +52,7 @@ class Player{
 			this.piles[i].empty();
 		}
 		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
+		this.piles.side.loadCards(this.originalSideDeckList,()=>{});
 		this.render();
 		
 		if(!oppAction){
