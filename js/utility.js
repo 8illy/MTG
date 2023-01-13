@@ -103,6 +103,7 @@ function processDeckList(rawTxt,ownerPlayer){
 	let sideboardIndex = lines.findIndex(function(a){return a.match(/sideboard/gi)});
 console.log(sideboardIndex);
 	if(sideboardIndex!=-1){
+		sideLines = lines.slice(sideboardIndex+1);
 		lines = lines.slice(0,sideboardIndex);
 	}	
 	//get quantities & card names
@@ -114,9 +115,19 @@ console.log(sideboardIndex);
 		}
 	});
 	
+	sideLines = sideLines.map(function(e){
+		let parts = e.split(" ");
+		return {
+			quantity : Number(parts.shift()),
+			name : parts.join(" "),	
+		}
+	});
+	
 	ownerPlayer.originalDeckList = lines;
+	ownerPlayer.originalSideDeckList = sideLines;
 	
 	ownerPlayer.piles.deck.loadCards(lines,()=>{ownerPlayer.render();});
+	ownerPlayer.piles.side.loadCards(sideLines,()=>{ownerPlayer.render();});
 }
 
 

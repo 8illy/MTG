@@ -214,13 +214,11 @@ class DBClient{
 		}
 	}
 	
-	connectOpponent(opponent){
-		this.opponent = opponent;
-		player1.setName(opponent);		
+	
+	sendDeck(deckType){
+		let deck = deckType==PILE_DECK?player2.originalDeckList:player2.originalSideDeckList;
 		
-		$("#loadingContainer").show();
-		
-		let deck = player2.originalDeckList.map((e)=>{
+		deck = deck.map((e)=>{
 			return {
 				q:e.quantity,
 				n:e.name,
@@ -229,6 +227,7 @@ class DBClient{
 		
 		let startGamePayload = {
 			action : "Start Game",
+			deckType : deckType,
 			deck : "",
 			count : 0,
 			order : 0,
@@ -269,6 +268,17 @@ class DBClient{
 			messages[i].count = messages.length;
 			this.sendToOpponent(messages[i]);
 		}
+		
+	}
+	
+	connectOpponent(opponent){
+		this.opponent = opponent;
+		player1.setName(opponent);		
+		
+		$("#loadingContainer").show();
+		
+		this.sendDeck(PILE_DECK);
+		this.sendDeck(PILE_SIDE);
 		
 	}
 
@@ -416,10 +426,22 @@ console.log(data);
 						}
 					});
 					
-					player1.deckCache[data.order] = lines;
-					if(Object.keys(player1.deckCache).length == data.count){
-						player1.loadDeck();
+					if(data.deckType==PILE_DECK){
+						//maindeck
+						player1.deckCache[data.order] = lines;
+						if(Object.keys(player1.deckCache).length == data.count){
+							player1.loadDeck();
+						}
+						
+					}else{
+						//sidedeck
+						player1.sideDeckCache[data.order] = lines;
+						if(Object.keys(player1.sideDeckCache).length == data.count){
+							player1.loadSideDeck();
+						}
 					}
+					
+					
 
 					$("#opponentForm").hide();
 				}else if(data.action=="Move To"){

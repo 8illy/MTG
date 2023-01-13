@@ -6,5 +6,6 @@ PILE_LANDS = "Lands";
 PILE_GRAVE = "Grave";
 PILE_EXILE = "Exiled";
 PILE_HAND = "Hand";
+PILE_SIDE = "Side";
 
 PILE_GENERIC = "Generic";

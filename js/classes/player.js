@@ -25,17 +25,24 @@ class Player{
 			artifacts : new Pile(PILE_ARTIFACTS,true,true,this),
 			walkers : new Pile(PILE_WALKERS,true,true,this),
 			lands : new Pile(PILE_LANDS,true,true,this),
+			
+			side : new Pile(PILE_SIDE,false,false,this),
 		};
 		
 		
 		this.deckCache = [];
-		
+		this.sideDeckCache = [];
 		
 	}
 	
 	loadDeck(){
 		this.originalDeckList = [].concat(...this.deckCache);//todo.
 		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
+	}	
+	
+	loadSideDeck(){
+		this.originalSideDeckList = [].concat(...this.sideDeckCache);//todo.
+		this.piles.deck.loadCards(this.originalSideDeckList,()=>{});
 	}
 	
 	reset(oppAction){
