@@ -60,7 +60,7 @@ class Pile{
 		
 		if(cardsToLoad.length <=apiCardLimit){
 			this.cardloadCache = [];
-			this.loadCardsFromAPI(cardsToLoad,()=>{
+			this.loadCardsFromAPI(cardsToLoad,0,()=>{
 				this.addLoadCards(cardsToLoad);
 				cb();
 			});
