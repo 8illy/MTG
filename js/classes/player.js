@@ -33,8 +33,11 @@ class Player{
 		this.deckCache = [];
 		this.sideDeckCache = [];
 		
+		this.originalSideDeckList = [];
+		this.originalDeckList = [];
+		
 	}
-	
+	/*
 	loadDeck(){
 		this.originalDeckList = [].concat(...this.deckCache);//todo.
 		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
@@ -43,6 +46,21 @@ class Player{
 	loadSideDeck(){
 		this.originalSideDeckList = [].concat(...this.sideDeckCache);//todo.
 		this.piles.side.loadCards(this.originalSideDeckList,()=>{});
+	}*/
+	
+	loadDeck(){
+		$("#loadingContainer").show();
+		this.piles.deck.loadCards(this.originalDeckList,()=>{
+			this.render();
+			if(this.originalSideDeckList.length){
+				this.piles.side.loadCards(this.originalSideDeckList,()=>{
+					this.render();
+					$("#loadingContainer").hide();
+				});
+			}else{
+				$("#loadingContainer").hide();
+			}
+		});
 	}
 	
 	reset(oppAction){
@@ -51,8 +69,9 @@ class Player{
 		for(let i in this.piles){
 			this.piles[i].empty();
 		}
-		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
-		this.piles.side.loadCards(this.originalSideDeckList,()=>{});
+		
+		this.loadDeck();
+		
 		this.render();
 		
 		if(!oppAction){

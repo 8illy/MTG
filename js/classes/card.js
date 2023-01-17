@@ -167,6 +167,7 @@ console.log(counterColour)
 		}
 		
 		pile.addCard(this,toTop);
+		
 		this.pile.render();
 		
 		if(this.scryPile){
@@ -176,6 +177,7 @@ console.log(counterColour)
 		}
 		
 		if(!oppAction){
+						
 			dbClient.sendToOpponent({
 				"action" : "Move To",
 				"uid" : this.uid,

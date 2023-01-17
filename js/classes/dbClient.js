@@ -14,13 +14,19 @@ class DBClient{
 		
 		this.logItems = [];
 		
+		this.gameLog = [];//for building replays.
+		
 		this.username = username;
 		this.rawPassword = password;
 		
 		
 		this.msgQueue = [];//messages yet to be sent
 		this.msgCache = {};//messages failed to sent, to be resent
-		this.receivedMessages = {};//messages received (only id)
+		//this.receivedMessages = {};//messages received (only id)
+		
+		this.receivedMessagesToBeProcessed = {};
+		this.lastReceivedMessageID = 0;
+		
 		
 		this.login();
 		/*
@@ -137,7 +143,7 @@ class DBClient{
 	sendQueue(){
 		if(this.msgQueue.length){
 			
-			this.messageNumber++;
+			this.messageNumber++; //this is the problem (?)
 			
 			let message = {
 				action:"Private message",
@@ -185,13 +191,25 @@ class DBClient{
 		this.socket =  new WebSocket("wss://duel.duelingbook.com:8443/");
 		
 		this.socket.addEventListener('message', (event) => {
+			let valid = false;
+			for(let msgId in this.receivedMessagesToBeProcessed){
+				let msg = this.receivedMessagesToBeProcessed[msgId];
+				valid = this.onData(msg);
+				if(!valid){
+					break;
+				}
+			}
 			this.onData(JSON.parse(event.data));
 		});
 		this.socket.onopen = (event)=>{
 
 			setInterval(()=>{this.keepAlive()},this.heartBeatInterval);
-			setInterval(()=>{this.sendQueue()},this.msgQueueInterval);
-			setInterval(()=>{this.queueLostMessages()},this.msgQueueLostInterval);
+			setInterval(()=>{
+				if(!this.queueLostMessages()){
+					this.sendQueue();
+				}
+			},this.msgQueueInterval);
+			//setInterval(()=>{this.queueLostMessages()},this.msgQueueInterval);
 			this.send({
 				"action": "Connect",
 				"username": this.username,
@@ -231,6 +249,7 @@ class DBClient{
 			deck : "",
 			count : 0,
 			order : 0,
+			hasSide : player2.originalSideDeckList.length>0,
 		};
 		
 		let firstCardIndex = 0;
@@ -291,25 +310,32 @@ class DBClient{
 	}
 	
 	queueLostMessages(){
-		let msgsToSend = Object.values(this.msgCache).filter((e)=>{
-			return e.time.getTime() + this.msgQueueLostTimeout < new Date();//get all that were longer than 3 seconds ago.
-		});
-				
-		for(let data of msgsToSend){
-	
-			let msgs = JSON.parse(data.msg.message)
-			
-			for(let msg of msgs.data){
-				this.msgQueue.push(msg);
+		let msgsToSend = Object.values(this.msgCache)/*.filter((e)=>{
+			return (e.time.getTime() + this.msgQueueLostTimeout ) < new Date();//get all that were longer than x seconds ago.
+		});*/
+		
+		if(msgsToSend.length){
+//console.log("queueLostMessages",msgsToSend);
+			if((msgsToSend[0].time.getTime() + this.msgQueueLostTimeout ) < new Date()){
+console.log("queueLostMessages sent item",msgsToSend[0].msgId);
+				msgsToSend[0].time = new Date();
+				this.send(msgsToSend[0].msg);
 			}
 			
-			delete this.msgCache[data.msgId];
 		}
+		
+		return msgsToSend.length > 0;
+	}
+
+	processReceivedMessagesToBeProcessed(){
+		
+		for(let msg of this.receivedMessagesToBeProcessed){
+			this.onData(msg);
+		}
+			
 	}
 
 	onData(msg){
-
-		
 		//do whatever here :)
 		if(msg.action == "Connected"){
 			
@@ -320,38 +346,63 @@ class DBClient{
 			console.log("Lost Connection");
 		}else if(msg.action == "Private message"){
 
-			let allData = JSON.parse(msg.message);
-
 			let sender = msg.username;
 			
-
+			//for now just assume no one real will pm us.
+			let allData = JSON.parse(msg.message);
 			
-			if(!this.opponent || (sender==this.opponent && !this.receivedMessages[allData.msgId]) || sender==this.username){
-				for(let data of allData.data){
-					
-					if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
-						this.connectOpponent(sender);//send them our decklist
-					}
-					
-					if(sender==this.opponent){
-						this.onMtgMsg(data,sender);
-					}
-					
-					this.onMtgMsgLog(data,sender);
-				}
-				
-				if(sender==this.username){
-					this.confirmMessageSent(allData.msgId);
+			if(sender==this.username){				
+				if(!this.msgCache[allData.msgId]){
+					console.log("duplicate message sent",allData.msgId);
+					return false;
 				}else{
-					this.confirmMessageReceived(allData.msgId);
+					console.log("confirm message sent",allData.msgId);
+					this.confirmMessageSent(allData.msgId);
+				}
+			}
+	
+
+			if((!this.opponent ||sender==this.opponent )&& sender!=this.username && (this.lastReceivedMessageID + 1) != allData.msgId){
+
+				if(allData.msgId <= this.lastReceivedMessageID){
+					return false;
+				}
+				this.receivedMessagesToBeProcessed[allData.msgId] = msg;
+				return false;
+			}else{
+				if(sender==this.opponent){
+					delete this.receivedMessagesToBeProcessed[allData.msgId];
+					this.lastReceivedMessageID = allData.msgId;
 				}
 				
+				
+				if(!this.opponent || (sender==this.opponent /*&& !this.receivedMessages[allData.msgId]*/) || sender==this.username){
+					for(let data of allData.data){
+						if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
+							this.lastReceivedMessageID = allData.msgId;//fix for initial loading.
+							this.connectOpponent(sender);//send them our decklist
+						}
+						
+						if(sender==this.opponent){
+							this.onMtgMsg(data,sender);
+						}
+						
+						this.gameLog.push({data:data,sender:sender});//to build replays
+						this.onMtgMsgLog(data,sender);
+					}
+					
+				}
+			
 			}
+			
+			
+			
+			
 				
 				
 			
 		}
-		
+		return true;
 	}
 	
 	onMtgMsgLog(data,sender){
@@ -417,7 +468,7 @@ class DBClient{
 			
 			if(sender==this.opponent){
 				if(data.action=="Start Game"){
-console.log(data);
+//console.log(data);
 					//processDeckList(data.deck,player1);
 					let lines = JSON.parse(data.deck).map((e)=>{
 						return {
@@ -429,16 +480,23 @@ console.log(data);
 					if(data.deckType==PILE_DECK){
 						//maindeck
 						player1.deckCache[data.order] = lines;
+						player1.deckCacheCount = data.count;
 						if(Object.keys(player1.deckCache).length == data.count){
-							player1.loadDeck();
-						}
-						
+							//player1.loadDeck();
+							player1.originalDeckList = [].concat(...player1.deckCache);//todo.
+						}						
 					}else{
 						//sidedeck
 						player1.sideDeckCache[data.order] = lines;
+						player1.sideDeckCacheCount = data.count;
 						if(Object.keys(player1.sideDeckCache).length == data.count){
-							player1.loadSideDeck();
+							//player1.loadSideDeck();
+							player1.originalSideDeckList = [].concat(...player1.sideDeckCache);//todo.
 						}
+					}
+					
+					if(player1.originalDeckList.length && (player1.originalSideDeckList.length || !data.hasSide)){
+						player1.loadDeck();
 					}
 					
 					

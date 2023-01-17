@@ -127,10 +127,10 @@ console.log(sideboardIndex);
 	ownerPlayer.originalDeckList = lines;
 	ownerPlayer.originalSideDeckList = sideLines;
 	
-	ownerPlayer.piles.deck.loadCards(lines,()=>{ownerPlayer.render();});
-	if(sideLines.length){
-		ownerPlayer.piles.side.loadCards(sideLines,()=>{ownerPlayer.render();});
-	}
+	ownerPlayer.loadDeck();
+	
+
+	
 }
 
 

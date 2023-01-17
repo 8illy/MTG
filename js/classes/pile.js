@@ -106,7 +106,6 @@ class Pile{
 			let cardData = allCardData.find((e)=>{
 				let names = e.name.split(/ \/\/ /g);
 				return e.name ==card.name || names.indexOf(card.name)!=-1;
-				
 			});
 			for(let i = 0;i<card.quantity;i++){
 				this.addCard(cardData);
@@ -153,15 +152,14 @@ class Pile{
 		arr.splice(newIndex, 0, card);
 	}
 	
-	
+	get order(){
+		return this.cards.map((e)=>{
+			return e.player==this.player? e.uidNumber:-e.uidNumber;
+		});
+	}
 	
 	shuffle(){
 		this.cards = shuffle(this.cards);
-		let order = this.cards.map((e)=>{
-			return e.player==this.player? e.uidNumber:-e.uidNumber;
-		});
-		
-		//todo - if opps card is in hand send its uid as negative, and detect this in setshuffle.
 		
 		this.render();
 		this.animateShuffle();
@@ -169,7 +167,7 @@ class Pile{
 			"action" : "Shuffle",
 			"pile" : this.type,
 			"player" : this.player.player,
-			"order" : JSON.stringify(order),
+			"order" : JSON.stringify(this.order),
 		});
 		
 	}
@@ -303,6 +301,9 @@ class Pile{
 	}
 	
 	viewPile(){
+		if(activePile){
+			activePile.stopViewingPile();
+		}
 		activePile = this;
 		this.render();
 		//$("#pileDisplayModal").modal("show");
