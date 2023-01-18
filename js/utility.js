@@ -94,6 +94,7 @@ function importDeck(deckFile){
 }
 
 
+
 function processDeckList(rawTxt,ownerPlayer){
 	//ownerPlayer.rawTxtDecklist = rawTxt;//outdated, as will change this for commander
 	
@@ -186,6 +187,9 @@ function startingHands(){
 }
 
 
+function filterUnique(e,i,a){
+	return a.indexOf(e)==i;
+}
 
 function clone(arr){
 	return JSON.parse(JSON.stringify(arr));
@@ -245,4 +249,25 @@ function flipCoin(){
 		"action" : "Coin",
 		"result" : result,
 	});
+}
+
+
+
+
+function downloadFile(fileName,fileContent) {
+	
+	let file = new File(fileContent, fileName, {
+		type: 'text/plain',
+	})
+
+	let link = document.createElement('a')
+	let url = URL.createObjectURL(file)
+
+	link.href = url
+	link.download = file.name
+	document.body.appendChild(link)
+	link.click()
+
+	document.body.removeChild(link)
+	window.URL.revokeObjectURL(url)
 }

@@ -7,8 +7,7 @@ class DBClient{
 		
 		this.heartBeatInterval = 30000;
 		this.msgQueueInterval = 300;
-		this.msgQueueLostInterval = 1000;
-		this.msgQueueLostTimeout = 1500;
+		this.msgQueueLostTimeout = 1000; //change this timeout?
 		
 		this.maxMsgSize = 500;
 		
@@ -22,20 +21,19 @@ class DBClient{
 		
 		this.msgQueue = [];//messages yet to be sent
 		this.msgCache = {};//messages failed to sent, to be resent
-		//this.receivedMessages = {};//messages received (only id)
 		
-		this.receivedMessagesToBeProcessed = {};
+		this.receivedMessagesToBeProcessed = {};//received messages, not yet processed.
 		this.lastReceivedMessageID = 0;
 		
-		
-		this.login();
-		/*
-		if(username && password){
+		if(this.username && this.rawPassword){
 			this.login();
-		}else{
-			this.db_id = localStorage.getItem("db_id");
-			this.relogin();
-		}*/
+		}
+		
+	}
+	
+	downloadReplay(){
+		let str = JSON.stringify(this.gameLog);
+		downloadFile("replay.mtg",str);
 	}
 	
 	log(str,player){
@@ -48,13 +46,7 @@ class DBClient{
 		this.logItems.push(log);
 		
 		$("#logOutput").prepend(TemplateEngine(logTemplate,log))
-		/*
-		if(player==player2){
-			dbClient.sendToOpponent({
-				"action" : "Log",
-				"log" : str,
-			});
-		}*/
+
 	}
 	
 	relogin(){//cant use this due to unsafe header.
@@ -65,18 +57,12 @@ class DBClient{
 		let formData= new URLSearchParams(payload).toString();
 		let headers = {"Content-Type": "application/x-www-form-urlencoded"};
 		doRequest("https://www.duelingbook.com/logged-in.php","POST",formData,headers,(resp)=>{
-			//localStorage.setItem("login",resp);
 			this.processLogin(JSON.parse(resp));
 		});
 	}
 
 	login(){
-		/*
-		if(localStorage.getItem("login")){
-			this.processLogin();
-			return;
-		}*/
-		
+	
 		let payload = { 
 				username: this.username,
 				password: this.rawPassword, 
@@ -88,13 +74,11 @@ class DBClient{
 		let headers = {"Content-Type": "application/x-www-form-urlencoded"};
 		
 		doRequest("https://www.duelingbook.com/php-scripts/login-user.php","POST",formData,headers,(resp)=>{
-			//localStorage.setItem("login",resp);
 			this.processLogin(JSON.parse(resp));
 		});
 	}
 	
 	processLogin(data){
-		//let data =JSON.parse(localStorage.getItem("login"));//JSON.parse(resp);
 		if(data.message =="Invalid password"){
 			//todo;
 			alert("Invalid Password");
@@ -113,7 +97,6 @@ class DBClient{
 		this.username = data.username;
 		
 		player2.setName(this.username);
-		//$('label[for="player2Life"]').text(this.username);
 		
 		this.connect();
 	}
@@ -124,7 +107,6 @@ class DBClient{
 		this.socket.send(JSON.stringify(data));
 	}
 	
-	//may need to add to a queue to prevent too many going at once here.
 	sendToOpponent(data){
 
 		let message = {
@@ -133,10 +115,8 @@ class DBClient{
 			username:this.opponent
 		};
 		
-		if(true){ // maybe allow instant message every X?
+		if(this.opponent){ 
 			this.msgQueue.push(data);
-		}else{
-			//this.send(message);
 		}
 	}
 	
@@ -209,7 +189,7 @@ class DBClient{
 					this.sendQueue();
 				}
 			},this.msgQueueInterval);
-			//setInterval(()=>{this.queueLostMessages()},this.msgQueueInterval);
+
 			this.send({
 				"action": "Connect",
 				"username": this.username,
@@ -310,14 +290,10 @@ class DBClient{
 	}
 	
 	queueLostMessages(){
-		let msgsToSend = Object.values(this.msgCache)/*.filter((e)=>{
-			return (e.time.getTime() + this.msgQueueLostTimeout ) < new Date();//get all that were longer than x seconds ago.
-		});*/
+		let msgsToSend = Object.values(this.msgCache);
 		
 		if(msgsToSend.length){
-//console.log("queueLostMessages",msgsToSend);
 			if((msgsToSend[0].time.getTime() + this.msgQueueLostTimeout ) < new Date()){
-console.log("queueLostMessages sent item",msgsToSend[0].msgId);
 				msgsToSend[0].time = new Date();
 				this.send(msgsToSend[0].msg);
 			}
@@ -336,7 +312,7 @@ console.log("queueLostMessages sent item",msgsToSend[0].msgId);
 	}
 
 	onData(msg){
-		//do whatever here :)
+
 		if(msg.action == "Connected"){
 			
 			$("#loginForm").hide();
@@ -406,7 +382,7 @@ console.log("queueLostMessages sent item",msgsToSend[0].msgId);
 	}
 	
 	onMtgMsgLog(data,sender){
-		let senderPlayer = sender==this.opponent?player1:player2;
+		let senderPlayer = players[sender];
 		let logMsg = "";
 		
 		let playerHighlight = data.player?players[data.player].colour:player2.colour;//;data.player==this.opponent?"red":"green";
@@ -417,7 +393,7 @@ console.log("queueLostMessages sent item",msgsToSend[0].msgId);
 		if(data.action=="Start Game"){
 			logMsg = `Started the Game`
 		}else if(data.action=="Move To"){
-			let card = cards[data.uid];//"+cards[card.uid]+")'"
+			let card = cards[data.uid];
 			let vis = card.visible||(card.oldPile?card.oldPile.faceUp:false);
 			if(card.cardData.name){
 				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
@@ -465,101 +441,98 @@ console.log("queueLostMessages sent item",msgsToSend[0].msgId);
 	}
 	
 	onMtgMsg(data,sender){
-			
-			if(sender==this.opponent){
-				if(data.action=="Start Game"){
-//console.log(data);
-					//processDeckList(data.deck,player1);
-					let lines = JSON.parse(data.deck).map((e)=>{
-						return {
-							name : e.n,
-							quantity : e.q,
-						}
-					});
-					
-					if(data.deckType==PILE_DECK){
-						//maindeck
-						player1.deckCache[data.order] = lines;
-						player1.deckCacheCount = data.count;
-						if(Object.keys(player1.deckCache).length == data.count){
-							//player1.loadDeck();
-							player1.originalDeckList = [].concat(...player1.deckCache);//todo.
-						}						
-					}else{
-						//sidedeck
-						player1.sideDeckCache[data.order] = lines;
-						player1.sideDeckCacheCount = data.count;
-						if(Object.keys(player1.sideDeckCache).length == data.count){
-							//player1.loadSideDeck();
-							player1.originalSideDeckList = [].concat(...player1.sideDeckCache);//todo.
-						}
-					}
-					
-					if(player1.originalDeckList.length && (player1.originalSideDeckList.length || !data.hasSide)){
-						player1.loadDeck();
-					}
-					
-					
+		let player = players[sender];
+		if(data.action=="Start Game"){
 
-					$("#opponentForm").hide();
-				}else if(data.action=="Move To"){
-					let card = cards[data.uid];
-					let pile = piles[data.player][data.pile];
-					let toTop =data.toTop;
-					let id =data.id;
-					
-					if(!card){
-						card = new Card({id:id},pile.player);
-						card.loadCard(()=>{this.onMtgMsgLog(data,sender);});
-					}
-					
-					card.moveTo(pile,true,toTop);
-					
-				}else if(data.action=="Clone"){
-					let card = cards[data.uid];
-					card.clone(true);
-										
-				}else if(data.action=="Shuffle"){
-					let pile = piles[data.player][data.pile];
-					pile.setShuffle(JSON.parse(data.order));	
-					
-				}else if(data.action=="Reveal"){
-					let pile = piles[data.player][data.pile];
-					pile.viewPile();
-				}else if(data.action=="Scry"){
-					let pile = piles[data.player][data.pile];
-					let number = data.number;
-					let reveal = data.reveal;
-					//would log something here to say they have scry'd
-					if(reveal){
-						pile.scry(number,true);
-					}
-				}else if(data.action=="Untap All"){
-					let pile = piles[data.player][data.pile];
-					pile.untapAll(true);
-				}else if(data.action=="Tapped"){
-					let card = cards[data.uid];
-					card.tapped = data.tapped;
-					card.pile.render();
-				}else if(data.action=="Flip"){
-					let card = cards[data.uid];
-					card.face = data.face;
-					card.pile.render();
-				}else if(data.action=="Counters"){
-					let card = cards[data.uid];
-					card.counters[data.colour] = data.counters;
-					card.pile.render();
-				}else if(data.action=="Set Life"){
-					let player = players[data.player];
-					let value = data.value;
-					
-					player.setLife(value,true);
-					
-				}else if(data.action=="Reset"){
-					let player = players[data.player];
-					player.reset(true);
+			let lines = JSON.parse(data.deck).map((e)=>{
+				return {
+					name : e.n,
+					quantity : e.q,
+				}
+			});
+			
+			if(data.deckType==PILE_DECK){
+				//maindeck
+				player.deckCache[data.order] = lines;
+				player.deckCacheCount = data.count;
+				if(Object.keys(player.deckCache).length == data.count){
+					//player1.loadDeck();
+					player.originalDeckList = [].concat(...player.deckCache);//todo.
+				}						
+			}else{
+				//sidedeck
+				player.sideDeckCache[data.order] = lines;
+				player.sideDeckCacheCount = data.count;
+				if(Object.keys(player.sideDeckCache).length == data.count){
+					//player1.loadSideDeck();
+					player.originalSideDeckList = [].concat(...player.sideDeckCache);//todo.
 				}
 			}
+			
+			if(player.originalDeckList.length && (player.originalSideDeckList.length || !data.hasSide)){
+				player.loadDeck();
+			}
+			
+			
+
+			$("#opponentForm").hide();
+		}else if(data.action=="Move To"){
+			let card = cards[data.uid];
+			let pile = piles[data.player][data.pile];
+			let toTop =data.toTop;
+			let id =data.id;
+			
+			if(!card){
+				card = new Card({id:id},pile.player);
+				card.loadCard(()=>{this.onMtgMsgLog(data,sender);});
+			}
+			
+			card.moveTo(pile,true,toTop);
+			
+		}else if(data.action=="Clone"){
+			let card = cards[data.uid];
+			card.clone(true);
+								
+		}else if(data.action=="Shuffle"){
+			let pile = piles[data.player][data.pile];
+			pile.setShuffle(JSON.parse(data.order));	
+			
+		}else if(data.action=="Reveal"){
+			let pile = piles[data.player][data.pile];
+			pile.viewPile();
+		}else if(data.action=="Scry"){
+			let pile = piles[data.player][data.pile];
+			let number = data.number;
+			let reveal = data.reveal;
+			//would log something here to say they have scry'd
+			if(reveal){
+				pile.scry(number,true);
+			}
+		}else if(data.action=="Untap All"){
+			let pile = piles[data.player][data.pile];
+			pile.untapAll(true);
+		}else if(data.action=="Tapped"){
+			let card = cards[data.uid];
+			card.tapped = data.tapped;
+			card.pile.render();
+		}else if(data.action=="Flip"){
+			let card = cards[data.uid];
+			card.face = data.face;
+			card.pile.render();
+		}else if(data.action=="Counters"){
+			let card = cards[data.uid];
+			card.counters[data.colour] = data.counters;
+			card.pile.render();
+		}else if(data.action=="Set Life"){
+			let player = players[data.player];
+			let value = data.value;
+			
+			player.setLife(value,true);
+			
+		}else if(data.action=="Reset"){
+			let player = players[data.player];
+			player.reset(true);
+		}
 
 	}
 	

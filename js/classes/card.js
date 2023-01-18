@@ -215,7 +215,9 @@ console.log(counterColour)
 	auxClick(event){
 console.log(event.button);
 		if (event.button == 1) {//middle click
-			this.toggleTapped();
+			if(!(dbClient instanceof Replay)){
+				this.toggleTapped();
+			}
 		}else if (event.button == 2) {//right click
 			this.pile.viewPile();
 		}

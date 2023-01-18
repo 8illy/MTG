@@ -24,6 +24,20 @@ function login(){
 	dbClient = new DBClient(username,password);
 }
 
+
+function loadReplay(deckFile){	
+	//read the file.
+	let fr=new FileReader();
+            
+	fr.onload= ()=>{
+		//rawDeckList = fr.result; // bad change this later :)
+		setup();
+		dbClient =  new Replay(JSON.parse(fr.result))
+	}
+          
+	fr.readAsText(deckFile);
+}
+
 function setup(){
 	player1 = new Player(1);//upper
 	player2 = new Player(2);//lower

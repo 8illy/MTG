@@ -172,6 +172,10 @@ input#scryNumber {
     height: 35px;
 }
 
+input#replayTimer {
+    width: 80px;
+}
+
 .controlRow > .controlRowInner {
     text-align: right;
     width: 60%;

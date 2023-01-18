@@ -253,7 +253,9 @@ class Pile{
 	}
 	
 	handleDrop(card){
-		card.moveTo(this);
+		if(!(dbClient instanceof Replay)){
+			card.moveTo(this);
+		}
 	}
 	
 	addDropEvent(){		

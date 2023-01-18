@@ -112,13 +112,15 @@ class Player{
 	}
 	
 	setName(name){
-		this.lifeDisplay.find(".playerLifeLabel").text(name);
-		piles[name] = piles[this.player];
-		players[name] = this;
-		this.$.attr("player",name);
-		delete piles[this.player];
-		delete players[this.player];
-		this.player = name;
+		if(name!=this.player){
+			this.lifeDisplay.find(".playerLifeLabel").text(name);
+			piles[name] = piles[this.player];
+			players[name] = this;
+			this.$.attr("player",name);
+			delete piles[this.player];
+			delete players[this.player];
+			this.player = name;
+		}
 	}
 	
 	setUpField(){
