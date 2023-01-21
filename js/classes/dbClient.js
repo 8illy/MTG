@@ -401,6 +401,9 @@ class DBClient{
 		}else if(data.action=="Clone"){
 			let card = cards[data.uid];		
 			logMsg = `Cloned ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],"+card.visible+")")}`;
+		}else if(data.action=="Destroy"){
+			let card = cards[data.uid];		
+			logMsg = `Destroyed ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Shuffle"){
 			logMsg = `Shuffled ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Reveal"){
@@ -492,7 +495,9 @@ class DBClient{
 		}else if(data.action=="Clone"){
 			let card = cards[data.uid];
 			card.clone(true);
-								
+		}else if(data.action=="Destroy"){
+			let card = cards[data.uid];
+			card.destroy(true);
 		}else if(data.action=="Shuffle"){
 			let pile = piles[data.player][data.pile];
 			pile.setShuffle(JSON.parse(data.order));	
