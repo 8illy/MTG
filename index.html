@@ -11,6 +11,7 @@
 		
 		<script type="text/javascript" src="./js/const.js"></script>
 		<script type="text/javascript" src="./js/utility.js"></script>
+		<script type="text/javascript" src="./js/classes/game.js"></script>
 		<script type="text/javascript" src="./js/classes/card.js"></script>
 		<script type="text/javascript" src="./js/classes/pile.js"></script>
 		<script type="text/javascript" src="./js/classes/player.js"></script>
@@ -34,7 +35,7 @@
 			<div>
 				<input type="text" name="dbUser" id="dbUser">
 				<input type="password" name="dbPass" id="dbPass">
-				<button onclick="login()">Login</button>
+				<button onclick="game.login()">Login</button>
 			</div>
 			<select id="dbUserSelector">
 				<option value="">Select Account</option>
@@ -42,13 +43,13 @@
 			
 			<div>
 				Or load a replay:
-				<input type="file" name="replayInput" id="replayInput" onchange="loadReplay(this.files[0])" accept=".mtg">
+				<input type="file" name="replayInput" id="replayInput" onchange="game.loadReplay(this.files[0])" accept=".mtg">
 
 			</div>
 			
 		</div>
 		
-		<input type="file" name="deckInput" id="deckInput" onchange="importDeck(this.files[0])" accept=".txt" style="display:none;">
+		<input type="file" name="deckInput" id="deckInput" onchange="game.importDeck(this.files[0])" accept=".txt" style="display:none;">
 				
 		<div class = "container row" id="boardContainer" style="display:none;">
 			<div id="leftSidebar" class="col-3">
@@ -84,29 +85,29 @@
 					<div class="row">
 						<div class="col-6 btnRow">
 							<label for="replayToggleTimer">Auto</label>
-							<input type="checkbox" id="replayToggleTimer" name="replayToggleTimer" onchange="dbClient.toggleTimer()"/>
-							<input type="number" step="100" value="1000" id="replayTimer" onchange="dbClient.timerInterval=this.value;dbClient.refreshTimer()"/>
+							<input type="checkbox" id="replayToggleTimer" name="replayToggleTimer" onchange="game.dbClient.toggleTimer()"/>
+							<input type="number" step="100" value="1000" id="replayTimer" onchange="game.dbClient.timerInterval=this.value;game.dbClient.refreshTimer()"/>
 							
 						</div>
 						<div class="col-6 btnRow">
-							<button onclick="dbClient.next()">Next</button>
+							<button onclick="game.dbClient.next()">Next</button>
 						</div>
 					</div>
 					
 					<div class="row">
 						<div class="col-6 btnRow">
 							<label for="replayToggleP1Hand">Show P1 Hand</label>
-							<input type="checkbox" id="replayToggleP1Hand" name="replayToggleP1Hand" onchange="player1.piles.hand.faceUp = this.checked;player1.render();"/>
+							<input type="checkbox" id="replayToggleP1Hand" name="replayToggleP1Hand" onchange="game.player1.piles.hand.faceUp = this.checked;game.player1.render();"/>
 						</div>
 						<div class="col-6 btnRow">
 							<label for="replayToggleP2Hand">Show P2 Hand</label>
-							<input type="checkbox" id="replayToggleP2Hand" name="replayToggleP2Hand" onchange="player2.piles.hand.faceUp = this.checked;player2.render();" checked/>
+							<input type="checkbox" id="replayToggleP2Hand" name="replayToggleP2Hand" onchange="game.player2.piles.hand.faceUp = this.checked;game.player2.render();" checked/>
 						</div>
 					</div>
 				</div>
 				
 				<div id="pileSidebarBox"  class="sidebarBox">
-					<button onclick="activePile.stopViewingPile()" id="stopViewingBtn" style="display:none;">Stop Viewing</button>
+					<button onclick="game.activePile.stopViewingPile()" id="stopViewingBtn" style="display:none;">Stop Viewing</button>
 					<div id="viewPileContainer">
 					
 					</div>
@@ -116,19 +117,19 @@
 					<div id="player1LifeDisplay" class="controlRow">
 						<div class="controlRowInner">
 							<label for="player1Life" class="playerLifeLabel">Player 1</label>
-							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="player1.syncLife();"/>
-							<button onclick="player1.reset();" class="resetDeckBtn">Reset Deck</button>
+							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="game.player1.syncLife();"/>
+							<button onclick="game.player1.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
 						<div id="opponentForm" style="display:none;">
 							<input type="text" name="dbOpponent" id="dbOpponent">
-							<button onclick="host()">Host</button>
+							<button onclick="game.host()">Host</button>
 						</div>
 					</div>
 					<div id="player2LifeDisplay" class="controlRow">
 						<div class="controlRowInner">
 							<label for="player2Life" class="playerLifeLabel">Player 2</label>
-							<input id="player2Life" name="player2Life" type="number" class="playerLife" value="20" step="1" onchange="player2.syncLife();"/>
-							<button onclick="player2.reset();" class="resetDeckBtn">Reset Deck</button>
+							<input id="player2Life" name="player2Life" type="number" class="playerLife" value="20" step="1" onchange="game.player2.syncLife();"/>
+							<button onclick="game.player2.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
 					</div>
 				</div>
@@ -142,56 +143,56 @@
 							</div>
 							<div class="col-6 btnRow">
 								<input type="number" step="1" value="3" id="scryNumber"/>
-								<button onclick="setAction('scry',this);">Scry</button>
+								<button onclick="game.ui.setAction('scry',this);">Scry</button>
 								<input type="checkbox" unchecked id="scryOpponent"/>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-6">
-								<button onclick="setAction('shuffle',this);">Shuffle</button>
+								<button onclick="game.ui.setAction('shuffle',this);">Shuffle</button>
 							</div>
 							<div class="col-6">
-								<button onclick="setAction('untapAll',this);">Untap All</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-6">
-								<button onclick="setAction('flip',this);">Flip</button>
-							</div>
-							<div class="col-6">
-								<button onclick="loadNewCards();">Add</button>
+								<button onclick="game.ui.setAction('untapAll',this);">Untap All</button>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-6">
-								<button onclick="setAction('clone',this);">Clone</button>
+								<button onclick="game.ui.setAction('flip',this);">Flip</button>
 							</div>
 							<div class="col-6">
-								<button onclick="setAction('destroy',this);">Destroy</button>
-							</div>
-						</div>
-						<div class="row">
-							<div class="col-6">
-								<button onclick="setAction('addCounter',this);setActionParam('Colour','addCounter');">Counter</button>
-							</div>
-							<div class="col-6">
-								<button onclick="setAction('removeCounter',this);setActionParam('Colour','removeCounter');">Remove Counter</button>
+								<button onclick="game.loadNewCards();">Add</button>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-6">
-								<button onclick="rollDice(6);">Dice</button>
+								<button onclick="game.ui.setAction('clone',this);">Clone</button>
 							</div>
 							<div class="col-6">
-								<button onclick="flipCoin();">Coin</button>
+								<button onclick="game.ui.setAction('destroy',this);">Destroy</button>
 							</div>
 						</div>
 						<div class="row">
 							<div class="col-6">
-								<button onclick="player2.piles.side.viewPile()">View Side Deck</button>
+								<button onclick="game.ui.setAction('addCounter',this);game.ui.setActionParam('Colour','addCounter');">Counter</button>
 							</div>
 							<div class="col-6">
-								<button onclick="player1.piles.side.viewPile()">View Opps Side Deck</button>
+								<button onclick="game.ui.setAction('removeCounter',this);game.ui.setActionParam('Colour','removeCounter');">Remove Counter</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<button onclick="game.rollDice(6);">Dice</button>
+							</div>
+							<div class="col-6">
+								<button onclick="game.flipCoin();">Coin</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<button onclick="game.player2.piles.side.viewPile()">View Side Deck</button>
+							</div>
+							<div class="col-6">
+								<button onclick="game.player1.piles.side.viewPile()">View Opps Side Deck</button>
 							</div>
 						</div>
 					

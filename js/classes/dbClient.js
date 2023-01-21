@@ -96,7 +96,7 @@ class DBClient{
 		this.password = data.password;
 		this.username = data.username;
 		
-		player2.setName(this.username);
+		game.player2.setName(this.username);
 		
 		this.connect();
 	}
@@ -160,8 +160,6 @@ class DBClient{
 		}
 	}
 	
-	
-	
 	keepAlive(){
 		this.send({"action":"Heartbeat"});
 	}
@@ -214,7 +212,8 @@ class DBClient{
 	
 	
 	sendDeck(deckType){
-		let deck = deckType==PILE_DECK?player2.originalDeckList:player2.originalSideDeckList;
+						
+		let deck = deckType==PILE_DECK?game.player2.originalDeckList:game.player2.originalSideDeckList;
 		
 		deck = deck.map((e)=>{
 			return {
@@ -229,7 +228,7 @@ class DBClient{
 			deck : "",
 			count : 0,
 			order : 0,
-			hasSide : player2.originalSideDeckList.length>0,
+			hasSide : game.player2.originalSideDeckList.length>0,
 		};
 		
 		let firstCardIndex = 0;
@@ -272,9 +271,9 @@ class DBClient{
 	
 	connectOpponent(opponent){
 		this.opponent = opponent;
-		player1.setName(opponent);		
+		game.player1.setName(opponent);		
 		
-		$("#loadingContainer").show();
+		game.ui.loading();
 		
 		this.sendDeck(PILE_DECK);
 		this.sendDeck(PILE_SIDE);
@@ -382,48 +381,48 @@ class DBClient{
 	}
 	
 	onMtgMsgLog(data,sender){
-		let senderPlayer = players[sender];
+		let senderPlayer = game.getPlayer(sender);
 		let logMsg = "";
 		
-		let playerHighlight = data.player?players[data.player].colour:player2.colour;//;data.player==this.opponent?"red":"green";
+		let playerHighlight = data.player?game.getPlayer(data.player).colour:game.player2.colour;
 		
 		let cardHighlight = "blue";
 		let locationHighlight = "coral";
 		
 		if(data.action=="Start Game"){
-			logMsg = `Started the Game`
+			//logMsg = `Started the Game`
 		}else if(data.action=="Move To"){
-			let card = cards[data.uid];
+			let card = game.cards[data.uid];
 			let vis = card.visible||(card.oldPile?card.oldPile.faceUp:false);
 			if(card.cardData.name){
-				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
+				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
 			}
 		}else if(data.action=="Clone"){
-			let card = cards[data.uid];		
-			logMsg = `Cloned ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],"+card.visible+")")}`;
+			let card = game.cards[data.uid];		
+			logMsg = `Cloned ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Destroy"){
-			let card = cards[data.uid];		
-			logMsg = `Destroyed ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],"+card.visible+")")}`;
+			let card = game.cards[data.uid];		
+			logMsg = `Destroyed ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Shuffle"){
 			logMsg = `Shuffled ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Reveal"){
-			let pile = piles[data.player][data.pile];			
+			let pile = game.piles[data.player][data.pile];			
 			logMsg = `Revealed ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Scry"){
 			logMsg = `Scried ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} for ${data.number}`;
 		}else if(data.action=="Untap All"){
 			logMsg = `Untapped All in ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Tapped"){
-			let card = cards[data.uid];
-			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)}`;
+			let card = game.cards[data.uid];
+			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)}`;
 		}else if(data.action=="Flip"){
-			let card = cards[data.uid];
+			let card = game.cards[data.uid];
 			if(card.visible){
-				logMsg = `Flipped ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
+				logMsg = `Flipped ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
 			}
 		}else if(data.action=="Counters"){
-			let card = cards[data.uid];
-			logMsg = `Set ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)} ${highlight("Counters",data.colour)} to ${data.counters}`;
+			let card = game.cards[data.uid];
+			logMsg = `Set ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)} ${highlight("Counters",data.colour)} to ${data.counters}`;
 			card.counters[data.colour] = data.counters;
 			card.pile.render();
 		}else if(data.action=="Set Life"){
@@ -444,7 +443,12 @@ class DBClient{
 	}
 	
 	onMtgMsg(data,sender){
-		let player = players[sender];
+		let senderPlayer = game.getPlayer(sender);
+		
+		let targetPlayer = game.getPlayer(data.player);
+		let targetCard = game.getCard(data.uid);
+		let targetPile = game.getPile(data.player,data.pile);
+
 		if(data.action=="Start Game"){
 
 			let lines = JSON.parse(data.deck).map((e)=>{
@@ -456,87 +460,69 @@ class DBClient{
 			
 			if(data.deckType==PILE_DECK){
 				//maindeck
-				player.deckCache[data.order] = lines;
-				player.deckCacheCount = data.count;
-				if(Object.keys(player.deckCache).length == data.count){
-					//player1.loadDeck();
-					player.originalDeckList = [].concat(...player.deckCache);//todo.
+				senderPlayer.deckCache[data.order] = lines;
+				senderPlayer.deckCacheCount = data.count;
+				if(Object.keys(senderPlayer.deckCache).length == data.count){
+					senderPlayer.originalDeckList = [].concat(...senderPlayer.deckCache);//todo.
 				}						
 			}else{
 				//sidedeck
-				player.sideDeckCache[data.order] = lines;
-				player.sideDeckCacheCount = data.count;
-				if(Object.keys(player.sideDeckCache).length == data.count){
-					//player1.loadSideDeck();
-					player.originalSideDeckList = [].concat(...player.sideDeckCache);//todo.
+				senderPlayer.sideDeckCache[data.order] = lines;
+				senderPlayer.sideDeckCacheCount = data.count;
+				if(Object.keys(senderPlayer.sideDeckCache).length == data.count){
+					senderPlayer.originalSideDeckList = [].concat(...senderPlayer.sideDeckCache);//todo.
 				}
 			}
 			
-			if(player.originalDeckList.length && (player.originalSideDeckList.length || !data.hasSide)){
-				player.loadDeck();
+			if(senderPlayer.originalDeckList.length && (senderPlayer.originalSideDeckList.length || !data.hasSide)){
+				senderPlayer.loadDeck();
+				game.ui.loadingPartDone();
 			}
 			
 			
 
 			$("#opponentForm").hide();
 		}else if(data.action=="Move To"){
-			let card = cards[data.uid];
-			let pile = piles[data.player][data.pile];
-			let toTop =data.toTop;
-			let id =data.id;
+			let toTop = data.toTop;
+			let id = data.id;
 			
-			if(!card){
-				card = new Card({id:id},pile.player);
-				card.loadCard(()=>{this.onMtgMsgLog(data,sender);});
+			if(!targetCard){
+				targetCard = new Card({id:id},pile.player);
+				targetCard.loadCard(()=>{this.onMtgMsgLog(data,sender);});
 			}
 			
-			card.moveTo(pile,true,toTop);
+			targetCard.moveTo(targetPile,true,toTop);
 			
 		}else if(data.action=="Clone"){
-			let card = cards[data.uid];
-			card.clone(true);
+			targetCard.clone(true);
 		}else if(data.action=="Destroy"){
-			let card = cards[data.uid];
-			card.destroy(true);
+			targetCard.destroy(true);
 		}else if(data.action=="Shuffle"){
-			let pile = piles[data.player][data.pile];
-			pile.setShuffle(JSON.parse(data.order));	
-			
+			targetPile.setShuffle(JSON.parse(data.order));				
 		}else if(data.action=="Reveal"){
-			let pile = piles[data.player][data.pile];
-			pile.viewPile();
+			targetPile.viewPile();
 		}else if(data.action=="Scry"){
-			let pile = piles[data.player][data.pile];
 			let number = data.number;
 			let reveal = data.reveal;
-			//would log something here to say they have scry'd
 			if(reveal){
-				pile.scry(number,true);
+				targetPile.scry(number,true);
 			}
 		}else if(data.action=="Untap All"){
-			let pile = piles[data.player][data.pile];
-			pile.untapAll(true);
+			targetPile.untapAll(true);
 		}else if(data.action=="Tapped"){
-			let card = cards[data.uid];
-			card.tapped = data.tapped;
-			card.pile.render();
+			targetCard.tapped = data.tapped;
+			targetCard.pile.render();
 		}else if(data.action=="Flip"){
-			let card = cards[data.uid];
-			card.face = data.face;
-			card.pile.render();
+			targetCard.face = data.face;
+			targetCard.pile.render();
 		}else if(data.action=="Counters"){
-			let card = cards[data.uid];
-			card.counters[data.colour] = data.counters;
-			card.pile.render();
+			targetCard.counters[data.colour] = data.counters;
+			targetCard.pile.render();
 		}else if(data.action=="Set Life"){
-			let player = players[data.player];
 			let value = data.value;
-			
-			player.setLife(value,true);
-			
+			targetPlayer.setLife(value,true);
 		}else if(data.action=="Reset"){
-			let player = players[data.player];
-			player.reset(true);
+			targetPlayer.reset(true);
 		}
 
 	}

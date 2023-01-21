@@ -10,8 +10,8 @@ class Player{
 		
 		this.setUpField();
 		
-		piles[this.player] = {};
-		players[this.player] = this;
+		game.piles[this.player] = {};
+		game.players[this.player] = this;
 		
 		
 		this.piles = {
@@ -37,28 +37,19 @@ class Player{
 		this.originalDeckList = [];
 		
 	}
-	/*
+
 	loadDeck(){
-		this.originalDeckList = [].concat(...this.deckCache);//todo.
-		this.piles.deck.loadCards(this.originalDeckList,()=>{this.render();$("#loadingContainer").hide();});
-	}	
-	
-	loadSideDeck(){
-		this.originalSideDeckList = [].concat(...this.sideDeckCache);//todo.
-		this.piles.side.loadCards(this.originalSideDeckList,()=>{});
-	}*/
-	
-	loadDeck(){
-		$("#loadingContainer").show();
+		game.ui.loading();
+		
 		this.piles.deck.loadCards(this.originalDeckList,()=>{
 			this.render();
 			if(this.originalSideDeckList.length){
 				this.piles.side.loadCards(this.originalSideDeckList,()=>{
 					this.render();
-					$("#loadingContainer").hide();
+					game.ui.loadingPartDone();
 				});
 			}else{
-				$("#loadingContainer").hide();
+				game.ui.loadingPartDone();
 			}
 		});
 	}
@@ -75,7 +66,7 @@ class Player{
 		this.render();
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Reset",
 				"player" : this.player,
 			});
@@ -101,7 +92,7 @@ class Player{
 		this.life = Number(value);
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Set Life",
 				"value" : this.life,
 				"player" : this.player,
@@ -114,18 +105,17 @@ class Player{
 	setName(name){
 		if(name!=this.player){
 			this.lifeDisplay.find(".playerLifeLabel").text(name);
-			piles[name] = piles[this.player];
-			players[name] = this;
+			game.piles[name] = game.piles[this.player];
+			game.players[name] = this;
 			this.$.attr("player",name);
-			delete piles[this.player];
-			delete players[this.player];
+			delete game.piles[this.player];
+			delete game.players[this.player];
 			this.player = name;
 		}
 	}
 	
 	setUpField(){
-		let output = TemplateEngine(fieldTemplate,{player:this.player});
-		$("#fieldContainer").append(output);
+		game.ui.addField(this.player);
 	}
 	
 	draw(){

@@ -10,8 +10,8 @@ class Replay extends DBClient{
 		this.opponent = playerNames[0];
 		this.username = playerNames[1];
 		
-		player1.setName(this.opponent);
-		player2.setName(this.username);
+		game.player1.setName(this.opponent);
+		game.player2.setName(this.username);
 		
 		$("#boardContainer").show();
 		$("#loginForm").hide();

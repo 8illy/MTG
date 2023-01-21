@@ -20,7 +20,7 @@ class Card{
 	generateUID(){
 		this.uidNumber = this.player.cardUidCount++;
 		this.uid = this.player.player+"-"+this.uidNumber
-		cards[this.uid] = this;
+		game.cards[this.uid] = this;
 	}
 	
 	get index(){
@@ -31,7 +31,7 @@ class Card{
 		return (
 			this.pile.faceUp || //public location
 			this.tapped ||  //tapped = revealed in hand
-			(!this.pile.faceUp&&this.pile==activePile) || //pile being viewed
+			(!this.pile.faceUp&&this.pile==game.activePile) || //pile being viewed
 			//(scryPile&&scryPile.cards.indexOf(this)!=-1) //pile being scry'd
 			this.scryPile //pile being scry'd
 		);
@@ -66,7 +66,7 @@ class Card{
 		this.face = this.face==1?0:1;
 		this.pile.render();
 		
-		dbClient.sendToOpponent({
+		game.dbClient.sendToOpponent({
 			"action" : "Flip",
 			"uid" : this.uid,
 			"face" : this.face,
@@ -84,17 +84,15 @@ class Card{
 	
 	incrementCounter(inc){
 		if(this.pile.spread && this.pile.type!=PILE_HAND){
-			this.counters[actionParam] = this.counters[actionParam]?this.counters[actionParam]:0;
-			this.counters[actionParam]+=inc;
-			this.syncCounters(actionParam);
+			this.counters[game.ui.actionParam] = this.counters[game.ui.actionParam]?this.counters[game.ui.actionParam]:0;
+			this.counters[game.ui.actionParam]+=inc;
+			this.syncCounters(game.ui.actionParam);
 			this.pile.render();
 		}
 	}
 	
 	syncCounters(counterColourRaw){
-console.log(counterColourRaw);
 		let counterColour = counterColourRaw.toLowerCase();
-console.log(counterColour)
 		if(this.counterTimers[counterColour]){
 			clearTimeout(this.counterTimers[counterColour]);
 		}
@@ -104,7 +102,7 @@ console.log(counterColour)
 	}
 	
 	sendCounters(counterColour){
-		dbClient.sendToOpponent({
+		game.dbClient.sendToOpponent({
 			"action" : "Counters",
 			"uid" : this.uid,
 			"colour" : counterColour,
@@ -119,7 +117,7 @@ console.log(counterColour)
 		this.pile.render();		
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Clone",
 				"uid" : this.uid,
 			});
@@ -131,7 +129,7 @@ console.log(counterColour)
 		this.pile.render();	
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Destroy",
 				"uid" : this.uid,
 			});
@@ -147,7 +145,7 @@ console.log(counterColour)
 		
 		this.oldPile = this.pile;
 		
-		if(this.pile && this.pile==loadPile){
+		if(this.pile && this.pile==game.loadPile){
 			this.player = pile.player;
 			this.generateUID();
 			
@@ -163,7 +161,7 @@ console.log(counterColour)
 		}
 
 		if(!oppAction){
-			toTop = (pile.type==PILE_DECK)?$("#topDeckCheckbox").prop("checked"):false;
+			toTop = (pile.type==PILE_DECK)?game.ui.toTopDeck:false;
 		}
 		
 		pile.addCard(this,toTop);
@@ -178,13 +176,13 @@ console.log(counterColour)
 		
 		if(!oppAction){
 						
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Move To",
 				"uid" : this.uid,
 				"pile" : pile.type,
 				"player" : pile.player.player,
 				"toTop" : toTop,
-				"id" : this.oldPile==loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
+				"id" : this.oldPile==game.loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
 			});
 		}
 		
@@ -195,7 +193,7 @@ console.log(counterColour)
 		this.pile.render();
 		
 		
-		dbClient.sendToOpponent({
+		game.dbClient.sendToOpponent({
 			"action" : "Tapped",
 			"uid" : this.uid,
 			"tapped" : this.tapped,
@@ -205,17 +203,16 @@ console.log(counterColour)
 	}
 	
 	click(event){
-		if(this[activeAction]){
-			this[activeAction]();
-		}else if(this.pile[activeAction]){
-			this.pile[activeAction]();
+		if(this[game.ui.activeAction]){
+			this[game.ui.activeAction]();
+		}else if(this.pile[game.ui.activeAction]){
+			this.pile[game.ui.activeAction]();
 		}
 	}
 	
 	auxClick(event){
-console.log(event.button);
 		if (event.button == 1) {//middle click
-			if(!(dbClient instanceof Replay)){
+			if(!game.isReplay){
 				this.toggleTapped();
 			}
 		}else if (event.button == 2) {//right click
@@ -235,21 +232,5 @@ console.log(event.button);
 			}
 		});
 	}
-	
-	keywordIcons(){//leave for now - doesnt look good.
-		let iconList = {
-			"Flying" : {icon : "kiwi-bird", colour: "#f7f7f7"},
-			"Deathtouch" : {icon : "skull", colour: "#000000"},
-			"Haste" : {icon : "fast-forward", colour: "#bb5555"},
-		}
 		
-		let icons = this.cardData.keywords.map((e)=>{
-			return iconList[e];
-		}).filter((e)=>{
-			return !!e;
-		});
-		
-		return TemplateEngine(iconsTemplate,{icons:icons});
-	}
-	
 }

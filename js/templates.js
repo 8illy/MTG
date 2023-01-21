@@ -1,9 +1,9 @@
 const cardTemplate = `
-	<div class="cardFrame" onmouseover="previewCard(cards['<%this.uid%>'])" onauxclick="cards['<%this.uid%>'].auxClick(event)" onclick="cards['<%this.uid%>'].click(event)" >
+	<div class="cardFrame" onmouseover="game.ui.previewCard(game.cards['<%this.uid%>'])" onauxclick="game.cards['<%this.uid%>'].auxClick(event)" onclick="game.cards['<%this.uid%>'].click(event)" >
 		
 		<%TemplateEngine(countersTemplate,this)%>
 		
-		<img  draggable="true" ondragstart="dragCard(event)" class="cardImg <%if(this.tapped){%>tapped<%}%>" src="<%this.image%>" uid="<%this.uid%>" <%if(this.pile.pileClass=='playerHand'){%>style = "<%handRotation(this)%>"<%}%>>
+		<img  draggable="true" ondragstart="dragCard(event)" class="cardImg <%if(this.tapped){%>tapped<%}%>" src="<%this.image%>" uid="<%this.uid%>">
 	</div>
 `;
 
@@ -29,15 +29,6 @@ let logTemplate = `
 		<div class="logPlayer col-9" style="color:<%this.player.colour%>;"><%this.player.player%></div>
 		<div class="logMessage col-12"><%this.msg%></div>
 	</div>
-`
-
-const iconsTemplate = `
-<div class="keywordIconContainer">
-	<%for(let i in this.icons){%>
-		<span class="fa fa-<%this.icons[i].icon%> keywordIcon" style="color:<%this.icons[i].colour%>;" title="<%i%>"></span>
-	<%}%>
-</div>
-
 `
 
 const viewPileTemplate = `

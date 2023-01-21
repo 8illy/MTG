@@ -10,7 +10,7 @@ class Pile{
 		this.cardloadCache = [];
 		
 		if(this.player){
-			piles[this.player.player][this.type] = this;
+			game.piles[this.player.player][this.type] = this;
 			
 			this.addDropEvent();
 		}
@@ -18,9 +18,8 @@ class Pile{
 	}
 	
 	setPlayer(player){
-		console.log(player);
 		this.player = player;
-		piles[this.player.player][this.type?this.type:"generic"] = this;
+		game.piles[this.player.player][this.type?this.type:"generic"] = this;
 	}
 	
 	get $(){
@@ -147,7 +146,7 @@ class Pile{
 	
 	moveCard(input,newIndex){
 		//input can be an existing card, or an index		
-		let card = getExistingCard(input);
+		let card = this.getExistingCard(input);
 		arr.splice(card.index, 1);
 		arr.splice(newIndex, 0, card);
 	}
@@ -163,7 +162,7 @@ class Pile{
 		
 		this.render();
 		this.animateShuffle();
-		dbClient.sendToOpponent({
+		game.dbClient.sendToOpponent({
 			"action" : "Shuffle",
 			"pile" : this.type,
 			"player" : this.player.player,
@@ -199,7 +198,7 @@ class Pile{
 		this.render();
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Untap All",
 				"pile" : this.type,
 				"player" : this.player.player,
@@ -233,7 +232,7 @@ class Pile{
 		}
 		
 		if(!oppAction){
-			dbClient.sendToOpponent({
+			game.dbClient.sendToOpponent({
 				"action" : "Scry",
 				"pile" : this.type,
 				"player" : this.player.player,
@@ -245,7 +244,7 @@ class Pile{
 	}
 	
 	reveal(){
-		dbClient.sendToOpponent({
+		game.dbClient.sendToOpponent({
 			"action" : "Reveal",
 			"pile" : this.type,
 			"player" : this.player.player,
@@ -253,7 +252,7 @@ class Pile{
 	}
 	
 	handleDrop(card){
-		if(!(dbClient instanceof Replay)){
+		if(!game.isReplay){
 			card.moveTo(this);
 		}
 	}
@@ -262,7 +261,7 @@ class Pile{
 	
 		this.$.on('dragover', false).on('drop',(ev)=>{	
 			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
-			let card = cards[uid];
+			let card = game.cards[uid];
 			this.handleDrop(card);
 			return false;
 		});
@@ -276,7 +275,7 @@ class Pile{
 			this.$.html(output);
 			this.resizeCardsIfOverflow();
 		}
-		if(activePile==this){
+		if(game.activePile==this){
 			this.renderViewPile();
 		}
 	}
@@ -295,7 +294,7 @@ class Pile{
 		
 		$("#viewPileContainer").on('dragover', false).on('drop',(ev)=>{	
 			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
-			let card = cards[uid];
+			let card = game.cards[uid];
 			this.handleDrop(card);
 			return false;
 		});
@@ -303,17 +302,17 @@ class Pile{
 	}
 	
 	viewPile(){
-		if(activePile){
-			activePile.stopViewingPile();
+		if(game.activePile){
+			game.activePile.stopViewingPile();
 		}
-		activePile = this;
+		game.activePile = this;
 		this.render();
 		//$("#pileDisplayModal").modal("show");
 		$("[tabContent='#pileSidebarBox']").click();
 		$("[tabContent='#pileSidebarBox'] > .fa").show();
 		$("#stopViewingBtn").show();
-		let colour = this.player==player1?player2.colour:player1.colour;
-		dbClient.sendToOpponent({
+		let colour = this.player==game.player1?game.player2.colour:game.player1.colour;
+		game.dbClient.sendToOpponent({
 			"action" : "Log",
 			"log" : `Viewed ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
@@ -323,7 +322,7 @@ class Pile{
 	stopViewingPile(){
 		$("[tabContent='#pileSidebarBox'] > .fa").hide();
 		$("#stopViewingBtn").hide();
-		activePile = undefined;
+		game.activePile = undefined;
 		$("#viewPileContainer").html("");
 		if(this.type==PILE_GENERIC){
 			this.empty();
@@ -333,8 +332,8 @@ class Pile{
 			this.render();
 		}
 		
-		let colour = this.player==player1?player2.colour:player1.colour;
-		dbClient.sendToOpponent({
+		let colour = this.player==game.player1?game.player2.colour:game.player1.colour;
+		game.dbClient.sendToOpponent({
 			"action" : "Log",
 			"log" : `Stopped Viewing ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
