@@ -45,7 +45,7 @@ class DBClient{
 		
 		this.logItems.push(log);
 		
-		$("#logOutput").prepend(TemplateEngine(logTemplate,log))
+		game.ui.addLog(log);
 
 	}
 	

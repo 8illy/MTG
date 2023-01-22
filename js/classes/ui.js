@@ -1,39 +1,75 @@
 class UI{
 	
 	constructor(){
-			//todo - this will handle all dom calls.
-			//also need to use to decide if safe to hide loading animations
-			this.loadingCount = 0;
-			this.activeAction = undefined;
-			this.actionParam = undefined;
+		//todo - this will handle all dom calls.
+		//also need to use to decide if safe to hide loading animations
+		this.loadingCount = 0;
+		this.activeAction = undefined;
+		this.actionParam = undefined;
+		
+		this.largeCardImg = $("#largeCardImg");
+		this.logOutputContainer = $("#logOutput");
+		this.loginForm = $("#loginForm");
+		this.boardContainer = $("#boardContainer");
+		this.fieldContainer = $("#fieldContainer");
+		this.userLoginSelector = $("#dbUserSelector");
+		
+		this.loginFormUser = $("#dbUser");
+		this.loginFormPass = $("#dbPass");
+		this.opponentInput = $("#dbOpponent");
+		
+		this.p1LifeDisplay = $('#player1LifeDisplay');
+		this.p2LifeDisplay = $('#player2LifeDisplay');
+		this.loadingContainer = $("#loadingContainer");
+		
+		this.topDeckCheckbox = $("#topDeckCheckbox");
+		this.scryShowOpponentCheckbox = $("#scryOpponent");
+		
+		this.viewPileContainer = $("#viewPileContainer");
+				
 	}
 	
 	//ui
 	
 	previewCard(card,forceVisible){
 		if(card.visible||forceVisible){
-			$("#largeCardImg").width($("#largeCardImg").width());
-			$("#largeCardImg").attr("src",card.largeImage)
+			this.largeCardImg.width(this.largeCardImg.width());
+			this.largeCardImg.attr("src",card.largeImage)
 		}
+	}
+	
+	addLog(log){
+		this.logOutputContainer.prepend(TemplateEngine(logTemplate,log));
+	}
+	
+	enableReplayMode(){
+		this.boardContainer.show();
+		this.loginForm.hide();
+		
+		$('[tabContent="#gameControls"]').hide();
+		$('[tabContent="#replaySidebarBox"]').show();
+		
+		$(".playerLife").prop("readonly",true)
+		$(".resetDeckBtn").hide();
 	}
 	
 	prepareLoginScreen(){
 		let loginData = localStorage.getItem("loginData")
 		if(loginData){
-			let dbUserSelector = $("#dbUserSelector");
 			loginData = JSON.parse(loginData);
 			for(let i in loginData){
-				dbUserSelector.append(`<option value="${i}">${i}</option>`);
+				this.userLoginSelector.append(`<option value="${i}">${i}</option>`);
 			}
-			$("#dbUserSelector").change(function(){
-				if($(this).val()){
-					$("#dbUser").val($(this).val());
-					$("#dbPass").val(loginData[$(this).val()]);
+			this.userLoginSelector.change(()=>{
+				let val = this.userLoginSelector.val();
+				if(val){
+					this.loginFormUser.val(val);
+					this.loginFormPass.val(loginData[val]);
 					game.login();
 				}
 			});
 		}else{
-			$("#dbUserSelector").hide();
+			this.userLoginSelector.hide();
 		}
 		
 		$("#sidebarBoxTabStrip > .sidebarBoxTabStripItem").click(function(){
@@ -50,42 +86,34 @@ class UI{
 	}
 	
 	host(){
-		let username = $("#dbOpponent").val();
-		dbClient.connectOpponent(username);
+		dbClient.connectOpponent(this.opponent);
 	}
 
 	login(){
-		let username = $("#dbUser").val();
-		let password = $("#dbPass").val();
-		
+
 		setup();
 		
-		dbClient = new DBClient(username,password);
-	}
-	
-	//ui actions
-	get p1LifeDisplay(){
-		return $('#player1LifeDisplay');
-	}
-	
-	get p2LifeDisplay(){
-		return $('#player2LifeDisplay');
+		dbClient = new DBClient(this.username,this.password);
 	}
 	
 	get toTopDeck(){
-		return $("#topDeckCheckbox").prop("checked");
+		return this.topDeckCheckbox.prop("checked");
+	}
+	
+	get scryShowOpponent(){
+		return this.scryShowOpponentCheckbox.prop("checked");
 	}
 	
 	get username(){
-		return $("#dbUser").val();
+		return this.loginFormUser.val();
 	}	
 	
 	get opponent(){
-		return $("#dbOpponent").val();
+		return this.opponentInput.val();
 	}	
 	
 	get password(){
-		return $("#dbPass").val();
+		return this.loginFormPass.val();
 	}
 	
 	setAction(a,elem){
@@ -107,7 +135,7 @@ class UI{
 	
 	//loading screens
 	loading(){
-		$("#loadingContainer").show();
+		this.loadingContainer.show();
 		this.loadingCount+=1;
 	}
 	
@@ -119,13 +147,26 @@ class UI{
 	}
 	
 	loadingFinished(){
-		$("#loadingContainer").hide();
+		this.loadingContainer.hide();
 	}
 	
 	//field setup
 	addField(playerName){
 		let output = TemplateEngine(fieldTemplate,{player:playerName});
-		$("#fieldContainer").append(output);
+		this.fieldContainer.append(output);
+	}
+	
+	renderViewPile(pile){
+		let output = TemplateEngine(viewPileTemplate,pile);
+		this.viewPileContainer.html(output);
+		
+		this.viewPileContainer.off('drop').on('dragover', false).on('drop',(ev)=>{	
+			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
+			let card = game.cards[uid];
+			pile.handleDrop(card);
+			return false;
+		});
+		
 	}
 	
 	

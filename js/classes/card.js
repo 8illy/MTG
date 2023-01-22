@@ -143,6 +143,10 @@ class Card{
 			this.counters = {};
 		}
 		
+		if(!pile.spread){
+			this.face = 0;//reset to "default" if exiled/gy/deck/hand
+		}
+		
 		this.oldPile = this.pile;
 		
 		if(this.pile && this.pile==game.loadPile){

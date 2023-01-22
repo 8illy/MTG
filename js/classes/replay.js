@@ -13,14 +13,7 @@ class Replay extends DBClient{
 		game.player1.setName(this.opponent);
 		game.player2.setName(this.username);
 		
-		$("#boardContainer").show();
-		$("#loginForm").hide();
-		
-		$('[tabContent="#gameControls"]').hide();
-		$('[tabContent="#replaySidebarBox"]').show();
-		
-		$(".playerLife").prop("readonly",true)
-		$(".resetDeckBtn").hide();
+		game.ui.enableReplayMode();
 		
 		this.timer = false;
 		this.timerInterval = 1000;//1 action per second.

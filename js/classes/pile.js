@@ -237,7 +237,7 @@ class Pile{
 				"pile" : this.type,
 				"player" : this.player.player,
 				"number" : num,
-				"reveal" : $("#scryOpponent").prop("checked"),
+				"reveal" : game.ui.scryShowOpponent,
 			});
 		}
 		
@@ -276,7 +276,7 @@ class Pile{
 			this.resizeCardsIfOverflow();
 		}
 		if(game.activePile==this){
-			this.renderViewPile();
+			game.ui.renderViewPile(this);
 		}
 	}
 	
@@ -286,19 +286,6 @@ class Pile{
 		}else{
 			this.$.find(".pile").removeClass("overflownPile");
 		}
-	}
-	
-	renderViewPile(){
-		let output = TemplateEngine(viewPileTemplate,this);
-		$("#viewPileContainer").html(output);
-		
-		$("#viewPileContainer").on('dragover', false).on('drop',(ev)=>{	
-			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");
-			let card = game.cards[uid];
-			this.handleDrop(card);
-			return false;
-		});
-		
 	}
 	
 	viewPile(){
