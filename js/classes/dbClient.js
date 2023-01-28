@@ -79,11 +79,17 @@ class DBClient{
 	}
 	
 	processLogin(data){
-		if(data.message =="Invalid password"){
-			//todo;
-			alert("Invalid Password");
+		game.ui.loadingPartDone();
+
+		if(data.message =="Invalid username"){
+			game.ui.showInvalidPassword();
 			return;
 		}
+		if(data.message =="Invalid password"){
+			game.ui.showInvalidUsername();
+			return;
+		}
+		
 		
 		let loginData = localStorage.getItem("loginData");
 		loginData=loginData?JSON.parse(loginData):{};
@@ -91,8 +97,8 @@ class DBClient{
 		localStorage.setItem("loginData",JSON.stringify(loginData));
 		
 		
-		
-		localStorage.setItem("db_id",this.db_id);
+		game.setup();
+
 		this.password = data.password;
 		this.username = data.username;
 		
@@ -313,10 +319,8 @@ class DBClient{
 	onData(msg){
 
 		if(msg.action == "Connected"){
-			
-			$("#loginForm").hide();
-			$("#deckInput").show();
-			
+			game.ui.hideDeckBackButton();
+			game.ui.showDeckForm();
 		}else if(msg.action == "Lost connection"){
 			console.log("Lost Connection");
 		}else if(msg.action == "Private message"){
@@ -395,14 +399,14 @@ class DBClient{
 			let card = game.cards[data.uid];
 			let vis = card.visible||(card.oldPile?card.oldPile.faceUp:false);
 			if(card.cardData.name){
-				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
+				logMsg = `Moved ${highlight(vis?card.cardData.name:"Unknown Card",cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],"+vis+")")} to ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)} from ${highlight(card.oldPile?card.oldPile.type:"Generic",locationHighlight)}`;
 			}
 		}else if(data.action=="Clone"){
 			let card = game.cards[data.uid];		
-			logMsg = `Cloned ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
+			logMsg = `Cloned ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Destroy"){
 			let card = game.cards[data.uid];		
-			logMsg = `Destroyed ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
+			logMsg = `Destroyed ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],"+card.visible+")")}`;
 		}else if(data.action=="Shuffle"){
 			logMsg = `Shuffled ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Reveal"){
@@ -414,15 +418,15 @@ class DBClient{
 			logMsg = `Untapped All in ${highlight(data.player,playerHighlight)}s ${highlight(data.pile,locationHighlight)}`;
 		}else if(data.action=="Tapped"){
 			let card = game.cards[data.uid];
-			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)}`;
+			logMsg = `${data.tapped?"Tapped":"Untapped"} ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)}`;
 		}else if(data.action=="Flip"){
 			let card = game.cards[data.uid];
 			if(card.visible){
-				logMsg = `Flipped ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
+				logMsg = `Flipped ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(data.pile,locationHighlight)}`;
 			}
 		}else if(data.action=="Counters"){
 			let card = game.cards[data.uid];
-			logMsg = `Set ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)} ${highlight("Counters",data.colour)} to ${data.counters}`;
+			logMsg = `Set ${highlight(card.player.player,card.player.colour)}s ${highlight(card.cardData.name,cardHighlight,"game.ui.previewCard(game.cards['"+card.uid+"'],true)")} in ${highlight(card.pile.type,locationHighlight)} ${highlight("Counters",data.colour)} to ${data.counters}`;
 			card.counters[data.colour] = data.counters;
 			card.pile.render();
 		}else if(data.action=="Set Life"){

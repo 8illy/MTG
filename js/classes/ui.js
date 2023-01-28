@@ -10,9 +10,14 @@ class UI{
 		this.largeCardImg = $("#largeCardImg");
 		this.logOutputContainer = $("#logOutput");
 		this.loginForm = $("#loginForm");
+		this.deckForm = $("#deckForm");
+		this.replayForm = $("#replayForm");
+		this.mainMenu = $("#mainMenu");
 		this.boardContainer = $("#boardContainer");
 		this.fieldContainer = $("#fieldContainer");
 		this.userLoginSelector = $("#dbUserSelector");
+		
+		this.views = $(".view");
 		
 		this.loginFormUser = $("#dbUser");
 		this.loginFormPass = $("#dbPass");
@@ -31,6 +36,40 @@ class UI{
 	
 	//ui
 	
+	//if we login, dont want them to backout once socket is active.
+	hideDeckBackButton(){
+		$("#deckBackButtonContainer").hide();
+	}
+	
+	showMainMenu(){
+		this.views.hide();
+		this.mainMenu.show();
+	}
+	
+	showField(){
+		this.views.hide();
+		this.boardContainer.show();
+	}
+	
+	showLoginForm(){
+		this.loginFormUser.val("");
+		this.loginFormPass.val("");
+		$("#usernameContainerBox").removeClass("invalidUsername");
+		$("#passwordContainerBox").removeClass("invalidPassword");
+		this.views.hide();
+		this.loginForm.show();
+	}	
+	
+	showDeckForm(){
+		this.views.hide();
+		this.deckForm.show();
+	}	
+	
+	showReplayForm(){
+		this.views.hide();
+		this.replayForm.show();
+	}
+	
 	previewCard(card,forceVisible){
 		if(card.visible||forceVisible){
 			this.largeCardImg.width(this.largeCardImg.width());
@@ -43,14 +82,18 @@ class UI{
 	}
 	
 	enableReplayMode(){
-		this.boardContainer.show();
-		this.loginForm.hide();
-		
+		this.showField();
+		$("#opponentForm").hide();
 		$('[tabContent="#gameControls"]').hide();
 		$('[tabContent="#replaySidebarBox"]').show();
-		
 		$(".playerLife").prop("readonly",true)
 		$(".resetDeckBtn").hide();
+	}
+	
+	enablePracticeMode(){
+		$("#opponentForm").hide();
+		//maybe hide logs?
+		$('[tabContent="#logSidebarBox"]').hide();
 	}
 	
 	prepareLoginScreen(){
@@ -137,6 +180,14 @@ class UI{
 	loading(){
 		this.loadingContainer.show();
 		this.loadingCount+=1;
+	}
+	
+	showInvalidPassword(){
+		$("#passwordContainerBox").addClass("invalidPassword");
+	}	
+	
+	showInvalidUsername(){
+		$("#usernameContainerBox").addClass("invalidUsername");
 	}
 	
 	loadingPartDone(){

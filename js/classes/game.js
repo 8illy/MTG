@@ -26,8 +26,15 @@ class Game{
 	}
 
 	login(){
-		this.setup();
+		this.ui.loading();
+		//this.setup();
 		this.dbClient = new DBClient(this.ui.username,this.ui.password);
+	}
+	
+	enablePracticeMode(){
+		this.setup();
+		this.dbClient = new DBClient();
+		this.ui.enablePracticeMode();
 	}
 	
 	getPlayer(playerName){
@@ -117,10 +124,14 @@ class Game{
 				
 		fr.onload= ()=>{
 			//rawDeckList = fr.result; // bad change this later :)
-			this.processDeckList(fr.result,this.player2);
 			
-			$("#opponentForm").show();
-			$("#boardContainer").show();
+			if(!this.player2){
+				this.enablePracticeMode();
+			}
+			
+			this.processDeckList(fr.result,this.player2);
+
+			this.ui.showField();
 		}
 			
 		fr.readAsText(deckFile);
@@ -134,8 +145,10 @@ class Game{
 		let lines = rawTxt.split(/\r?\n/);
 		let sideLines = [];
 		lines = lines.filter(function(e){return !!e.trim()});
-		//for now ignore sideboard
-		let sideboardIndex = lines.findIndex(function(a){return a.match(/sideboard/gi)});
+
+		let sideboardIndex = lines.findIndex(function(a){
+			return a=="" || a.match(/sideboard/gi)
+		});
 	
 		if(sideboardIndex!=-1){
 			sideLines = lines.slice(sideboardIndex+1);

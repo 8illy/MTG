@@ -8,6 +8,7 @@ user-select: none; /* Standard */
 	--mtg-fg-colour : #7f7f7f;
 	--mtg-input-colour : #9e9e9e;
 	--mtg-selected-colour : green;
+	--mtg-invalid-colour : red;
 }
 
 
@@ -275,4 +276,56 @@ div#logOutput {
     border: 1px solid black;
     background: var(--mtg-fg-colour);
     border-collapse: collapse;
+}
+
+#mainMenu {
+    height: 100vh;
+    padding-top: 25vh;
+}
+
+.menuItemsContainer {
+    width: 50%;
+    margin: auto;
+    border: 1px solid black;
+    background: var(--mtg-fg-colour);
+    border-radius: 4px;
+    height: 50%;
+    text-align: center;
+    padding: 40px;
+}
+
+.mainMenuButton {
+    width: 100%;
+    padding: 15px;
+    font-size: 20px;
+    border-radius: 5px;
+}
+
+
+
+.menuItemContainer{
+	width:30%;
+	margin:auto;
+	margin-bottom:10px
+}
+
+.menuItemTitle {
+    font-size: 30px;
+}
+
+.viewMenu{
+	padding-top:25vh;
+}
+
+.invalidUsername:after,
+.invalidPassword:after {
+    content: "Invalid Password";
+    color: var(--mtg-invalid-colour);
+    display: block;
+    text-align: left;
+    font-size: 14px;
+}
+
+.invalidUsername:after {
+    content: "Invalid Username";
 }

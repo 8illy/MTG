@@ -30,28 +30,93 @@
 			</div>
 		</div>
 		
+		<div id="mainMenu" class="view viewMenu">
+			<div class="menuItemsContainer">
+				<div class="menuItemContainer menuItemTitle">
+					MTG Game
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.ui.showLoginForm()">Play Online</button>
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.ui.showDeckForm()">Practice Mode</button>
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.ui.showReplayForm()">Replay Viewer</button>
+				</div>
+				
+			</div>
 		
-		<div id="loginForm">
-			<div>
-				<input type="text" name="dbUser" id="dbUser">
-				<input type="password" name="dbPass" id="dbPass">
-				<button onclick="game.login()">Login</button>
-			</div>
-			<select id="dbUserSelector">
-				<option value="">Select Account</option>
-			</select>
-			
-			<div>
-				Or load a replay:
-				<input type="file" name="replayInput" id="replayInput" onchange="game.loadReplay(this.files[0])" accept=".mtg">
-
-			</div>
-			
 		</div>
 		
-		<input type="file" name="deckInput" id="deckInput" onchange="game.importDeck(this.files[0])" accept=".txt" style="display:none;">
-				
-		<div class = "container row" id="boardContainer" style="display:none;">
+		<div id="replayForm" style="display:none" class="view viewMenu">
+			<div class="menuItemsContainer">
+				<div class="menuItemContainer menuItemTitle">
+					Upload Replay File
+				</div>
+				<div class="menuItemContainer">
+					<input type="file" name="replayInput" id="replayInput" onchange="game.loadReplay(this.files[0])" accept=".mtg">
+				</div>
+				<div class="menuItemContainer">
+					Replay Files are Generated during Gameplay
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.ui.showMainMenu()">Back</button>
+				</div>
+			</div>
+		</div>
+		
+		<div id="deckForm" style="display:none" class="view viewMenu">
+			<div class="menuItemsContainer">
+				<div class="menuItemContainer menuItemTitle">
+					Upload Deck File
+				</div>
+				<div class="menuItemContainer">
+					<input type="file" name="deckInput" id="deckInput" onchange="game.importDeck(this.files[0])" accept=".txt">
+				</div>
+				<div class="menuItemContainer">
+					Deck Files are a list of quantities and the cards you run in deck, one card per line.
+				</div>
+				<div class="menuItemContainer">
+					For 2-Faced cards use the name of the primary side
+				</div>
+				<div class="menuItemContainer">
+					For Sideboard, either leave a blank line or the word "Sideboard"
+				</div>
+				<div class="menuItemContainer" id="deckBackButtonContainer">
+					<button class="mainMenuButton" onclick="game.ui.showMainMenu()">Back</button>
+				</div>
+			</div>
+		</div>
+		
+		<div id="loginForm" style="display:none" class="view viewMenu">
+			<div class="menuItemsContainer">
+				<div class="menuItemContainer menuItemTitle">
+					Login
+				</div>
+				<div class="menuItemContainer" id="usernameContainerBox">
+					<input class="mainMenuButton" type="text" name="dbUser" id="dbUser" placeholder="Username">
+				</div>
+				<div class="menuItemContainer" id="passwordContainerBox">
+					<input class="mainMenuButton" type="password" name="dbPass" id="dbPass" placeholder="Password">
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.login()">Login</button>
+				</div>
+				<div class="menuItemContainer">
+					Or <select id="dbUserSelector">
+						<option value="">Select Account</option>
+					</select>
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.ui.showMainMenu()">Back</button>
+				</div>
+			</div>
+		</div>
+		
+
+		
+		<div class = "container row" id="boardContainer" style="display:none;" class="view">
 			<div id="leftSidebar" class="col-3">
 				<div id="cardPreviewContainer">
 					<div class="cardFrame">
@@ -120,7 +185,7 @@
 							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="game.player1.syncLife();"/>
 							<button onclick="game.player1.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
-						<div id="opponentForm" style="display:none;">
+						<div id="opponentForm">
 							<input type="text" name="dbOpponent" id="dbOpponent">
 							<button onclick="game.host()">Host</button>
 						</div>
