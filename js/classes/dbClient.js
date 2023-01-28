@@ -487,7 +487,7 @@ class DBClient{
 			let id = data.id;
 			
 			if(!targetCard){
-				targetCard = new Card({id:id},pile.player);
+				targetCard = new Card({id:id},targetPile.player);
 				targetCard.loadCard(()=>{this.onMtgMsgLog(data,sender);});
 			}
 			
