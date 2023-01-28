@@ -74,18 +74,20 @@ class Card{
 		
 	}
 	
-	addCounter(){
-		this.incrementCounter(1);
+	addCounter(counter){
+		counter = counter?counter:game.ui.actionParam;
+		this.incrementCounter(counter,1);
 	}
 	
-	removeCounter(){
-		this.incrementCounter(-1)
+	removeCounter(counter){
+		counter = counter?counter:game.ui.actionParam;
+		this.incrementCounter(counter,-1)
 	}
 	
-	incrementCounter(inc){
+	incrementCounter(counter,inc){
 		if(this.pile.spread && this.pile.type!=PILE_HAND){
-			this.counters[game.ui.actionParam] = this.counters[game.ui.actionParam]?this.counters[game.ui.actionParam]:0;
-			this.counters[game.ui.actionParam]+=inc;
+			this.counters[counter] = this.counters[counter]?this.counters[counter]:0;
+			this.counters[counter]+=inc;
 			this.syncCounters(game.ui.actionParam);
 			this.pile.render();
 		}

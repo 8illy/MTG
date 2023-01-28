@@ -10,9 +10,9 @@ const cardTemplate = `
 const countersTemplate = `
 	<div class="cardCountersContainerOuter">
 		<div class="cardCountersContainer">
-			<%for(let i in this.counters){%>
-				<div class="cardCounter" style="background-color:<%i%>"><%this.counters[i]%></div>
-			<%}%>
+			<%for(let i in this.counters){if(this.counters[i] != 0){%>
+				<div onclick="game.cards['<%this.uid%>'].addCounter('<%i%>');" onauxclick="if(event.button == 2){game.cards['<%this.uid%>'].removeCounter('<%i%>');event.stopPropagation();}" class="cardCounter" style="background-color:<%i%>"><%this.counters[i]%></div>
+			<%}}%>
 		</div>
 	</div>
 `;
