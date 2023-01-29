@@ -63,16 +63,22 @@ class Game{
 	}
 	
 	setup(){
+		if(!this.player1){
+			this.player1 = new Player(1);//upper
+			this.player1.colour = "red";
+			this.player1.lifeDisplay = this.ui.p1LifeDisplay;
+		}else{
+			this.player1.emptyPiles();
+		}
 		
-		this.player1 = new Player(1);//upper
-		this.player2 = new Player(2);//lower
-		
-		this.player1.colour = "red";
-		this.player2.colour="green";
-		
-		this.player1.lifeDisplay = this.ui.p1LifeDisplay;
-		this.player2.lifeDisplay = this.ui.p2LifeDisplay;
-		
+		if(!this.player2){
+			this.player2 = new Player(2);//lower
+			this.player2.colour="green";
+			this.player2.lifeDisplay = this.ui.p2LifeDisplay;
+		}else{
+			this.player2.emptyPiles();
+		}
+
 		this.player1.piles.hand.faceUp = false;//cant see opps hand.
 	}
 	

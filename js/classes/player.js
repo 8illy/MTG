@@ -54,15 +54,17 @@ class Player{
 		});
 	}
 	
-	reset(oppAction){
-		this.life = 20;
+	emptyPiles(){
 		this.cardUidCount = 1;
 		for(let i in this.piles){
 			this.piles[i].empty();
 		}
-		
+	}
+	
+	reset(oppAction){
+		this.life = 20;
+		this.emptyPiles();
 		this.loadDeck();
-		
 		this.render();
 		
 		if(!oppAction){
@@ -116,10 +118,6 @@ class Player{
 	
 	setUpField(){
 		game.ui.addField(this.player);
-	}
-	
-	draw(){
-		this.piles.deck.topCard.moveTo(this.piles.hand);
 	}
 	
 	render(){

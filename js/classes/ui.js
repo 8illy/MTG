@@ -208,8 +208,12 @@ class UI{
 	}
 	
 	renderViewPile(pile){
+		let scrolledTo = game.ui.viewPileContainer.find(".viewPile").scrollTop();
+		
 		let output = TemplateEngine(viewPileTemplate,pile);
 		this.viewPileContainer.html(output);
+		
+		game.ui.viewPileContainer.find(".viewPile").scrollTop(scrolledTo);
 		
 		this.viewPileContainer.off('drop').on('dragover', false).on('drop',(ev)=>{	
 			let uid = ev.originalEvent.dataTransfer.getData("selectedCard");

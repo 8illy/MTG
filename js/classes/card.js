@@ -16,6 +16,7 @@ class Card{
 		this.generateUID();
 		
 	}
+
 	
 	generateUID(){
 		this.uidNumber = this.player.cardUidCount++;
@@ -138,47 +139,66 @@ class Card{
 		}
 	}
 	
-	moveTo(pile,oppAction,toTop){
-		this.tapped = false;
-		
-		if(!pile.spread || pile.type == PILE_HAND){
-			this.counters = {};
+	onDragOver(event){
+		if(this.pile.spread || this.pile==game.activePile || this.scryPile){
+			let uid = event.dataTransfer.getData("selectedCard");
+			let card = game.cards[uid];
+			let newIndex = this.pile.cards.indexOf(this);
+			if(!game.isReplay){
+				card.moveTo(this.pile,newIndex);
+			}
+			event.stopPropagation();
+			return false;
 		}
+	}	
 		
-		if(!pile.spread){
-			this.face = 0;//reset to "default" if exiled/gy/deck/hand
-		}
-		
-		this.oldPile = this.pile;
-		
-		if(this.pile && this.pile==game.loadPile){
-			this.player = pile.player;
-			this.generateUID();
+	moveTo(pile,index,oppAction){
+		if(this.scryPile&&pile==this.pile){
+			this.scryPile.moveCard(this,index);
+			this.pile.moveCard(this,index);
+			this.scryPile.render();
+		}else{
+			this.tapped = false;
+
+			if(!pile.spread || pile.type == PILE_HAND){
+				this.counters = {};
+			}
 			
-			let oldIndex = this.pile.cards.indexOf(this);
-			this.pile.cards[oldIndex] = new Card(clone(this.cardData),this.pile.player)
-			this.pile.cards[oldIndex].pile = this.pile;
-			//this.pile.addCard(clone(this.cardData));
-		}
+			if(!pile.spread){
+				this.face = 0;//reset to "default" if exiled/gy/deck/hand
+			}
+			
+			this.oldPile = this.pile;
+			
+			if(this.pile && this.pile==game.loadPile){
+				this.player = pile.player;
+				this.generateUID();
+				
+				let oldIndex = this.pile.cards.indexOf(this);
+				this.pile.cards[oldIndex] = new Card(clone(this.cardData),this.pile.player)
+				this.pile.cards[oldIndex].pile = this.pile;
+				//this.pile.addCard(clone(this.cardData));
+			}
+			
+			if(this.pile){
+				this.pile.removeCard(this);
+				this.pile.render();
+			}
+	
+			if(!oppAction && index==undefined){
+				index = (pile.type==PILE_DECK&&game.ui.toTopDeck)?0:undefined;
+			}
+			
+			pile.addCard(this,index);
+			if(this.scryPile){
+				this.scryPile.removeCard(this);
+				this.scryPile.render();
+				delete this.scryPile;
+			}
 		
-		if(this.pile){
-			this.pile.removeCard(this);
-			this.pile.render();
 		}
 
-		if(!oppAction){
-			toTop = (pile.type==PILE_DECK)?game.ui.toTopDeck:false;
-		}
-		
-		pile.addCard(this,toTop);
-		
 		this.pile.render();
-		
-		if(this.scryPile){
-			this.scryPile.removeCard(this);
-			this.scryPile.render();
-			delete this.scryPile;
-		}
 		
 		if(!oppAction){
 						
@@ -187,7 +207,7 @@ class Card{
 				"uid" : this.uid,
 				"pile" : pile.type,
 				"player" : pile.player.player,
-				"toTop" : toTop,
+				"index" : index,
 				"id" : this.oldPile==game.loadPile?this.cardData.id:undefined,//incase we need to load the card data in.
 			});
 		}
@@ -224,6 +244,8 @@ class Card{
 		}else if (event.button == 2) {//right click
 			this.pile.viewPile();
 		}
+		event.stopPropagation();
+		return false;
 	}
 	
 	loadCard(cb){

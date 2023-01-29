@@ -217,7 +217,7 @@
 								<button onclick="game.ui.setAction('shuffle',this);">Shuffle</button>
 							</div>
 							<div class="col-6">
-								<button onclick="game.ui.setAction('untapAll',this);">Untap All</button>
+								<button onclick="game.ui.setAction('addCounter',this);game.ui.setActionParam('Colour','addCounter');">Counter</button>
 							</div>
 						</div>
 						<div class="row">
@@ -236,14 +236,7 @@
 								<button onclick="game.ui.setAction('destroy',this);">Destroy</button>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col-6">
-								<button onclick="game.ui.setAction('addCounter',this);game.ui.setActionParam('Colour','addCounter');">Counter</button>
-							</div>
-							<div class="col-6">
-								<button onclick="game.ui.setAction('removeCounter',this);game.ui.setActionParam('Colour','removeCounter');">Remove Counter</button>
-							</div>
-						</div>
+						
 						<div class="row">
 							<div class="col-6">
 								<button onclick="game.rollDice(6);">Dice</button>

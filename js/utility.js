@@ -1,3 +1,7 @@
+function arrayMove(arr,from, to) {
+	arr.splice(to, 0, arr.splice(from, 1)[0]);
+};
+
 function dragCard(ev) {
 	let uid  = ev.target.getAttribute("uid");
 	ev.dataTransfer.setData("selectedCard", uid);

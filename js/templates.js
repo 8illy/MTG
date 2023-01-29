@@ -1,5 +1,5 @@
 const cardTemplate = `
-	<div class="cardFrame" onmouseover="game.ui.previewCard(game.cards['<%this.uid%>'])" onauxclick="game.cards['<%this.uid%>'].auxClick(event)" onclick="game.cards['<%this.uid%>'].click(event)" >
+	<div ondragover="false;" ondrop="game.cards['<%this.uid%>'].onDragOver(event);" class="cardFrame" onmouseover="game.ui.previewCard(game.cards['<%this.uid%>'])" onauxclick="game.cards['<%this.uid%>'].auxClick(event)" onclick="game.cards['<%this.uid%>'].click(event)" >
 		
 		<%TemplateEngine(countersTemplate,this)%>
 		

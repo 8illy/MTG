@@ -13,6 +13,7 @@ class Pile{
 			game.piles[this.player.player][this.type] = this;
 			
 			this.addDropEvent();
+			this.addAuxClickEvent();
 		}
 		
 	}
@@ -33,21 +34,25 @@ class Pile{
 		return this.cards[0];
 	}
 		
-	addCard(input,toTop){
+	moveCard(input,newIndex){
+		//input can be an existing card, or an index		
+		let card = this.getExistingCard(input);
+		let oldIndex = this.cards.indexOf(card);
+		newIndex = newIndex ? newIndex : 0;
+		arrayMove(this.cards,oldIndex, newIndex);
+	}
+		
+	addCard(input,newIndex){
 		//input can be an existing card, or a card id
 		//if it is a card id need to create a new card.
 		//by default add to the bottom (highest index)
 		let card = this.getOrCreateCard(input);
-		let index;
-		if(toTop){
-			this.cards.unshift(card);
-			index = 0;
-		}else{
-			index = this.cards.push(card);
+		this.cards.push(card);
+		if(newIndex!=undefined){
+			this.moveCard(card,newIndex);
 		}
 				
 		card.pile = this;
-		
 		return card;
 	}
 	
@@ -144,13 +149,6 @@ class Pile{
 		return this.cards.splice(index,1)[0];
 	}
 	
-	moveCard(input,newIndex){
-		//input can be an existing card, or an index		
-		let card = this.getExistingCard(input);
-		arr.splice(card.index, 1);
-		arr.splice(newIndex, 0, card);
-	}
-	
 	get order(){
 		return this.cards.map((e)=>{
 			return e.player==this.player? e.uidNumber:-e.uidNumber;
@@ -219,6 +217,9 @@ class Pile{
 	}
 	
 	scry(num,oppAction){
+		if(this.type!=PILE_DECK){
+			return;
+		}
 		num = num?num:$("#scryNumber").val();
 		if(num){
 			let scryPile = new Pile(PILE_GENERIC,false,false,this.player);
@@ -267,6 +268,16 @@ class Pile{
 		});
 		
 		
+	}	
+	
+	addAuxClickEvent(){		
+		this.$.on('auxclick', false).on('auxclick',(event)=>{		
+			if (event.which == 2) {//middle click
+				this.untapAll();
+			}else if (event.which == 3) {//right click
+				this.viewPile();
+			}
+		});
 	}
 	
 	render(){

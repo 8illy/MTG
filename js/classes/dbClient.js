@@ -185,8 +185,19 @@ class DBClient{
 			}
 			this.onData(JSON.parse(event.data));
 		});
+		
+		this.socket.onclose = (event)=>{
+			game.ui.showMainMenu();
+			alert("Error - Lost Connection");
+		}
+		
+		this.socket.onerror = (event)=>{
+			game.ui.showMainMenu();
+			alert("Error - Lost Connection");
+		}
+		
 		this.socket.onopen = (event)=>{
-
+			this.keepAlive();
 			setInterval(()=>{this.keepAlive()},this.heartBeatInterval);
 			setInterval(()=>{
 				if(!this.queueLostMessages()){
@@ -487,7 +498,7 @@ class DBClient{
 
 			$("#opponentForm").hide();
 		}else if(data.action=="Move To"){
-			let toTop = data.toTop;
+			let index = data.index;
 			let id = data.id;
 			
 			if(!targetCard){
@@ -495,7 +506,7 @@ class DBClient{
 				targetCard.loadCard(()=>{this.onMtgMsgLog(data,sender);});
 			}
 			
-			targetCard.moveTo(targetPile,true,toTop);
+			targetCard.moveTo(targetPile,index,true);
 			
 		}else if(data.action=="Clone"){
 			targetCard.clone(true);
