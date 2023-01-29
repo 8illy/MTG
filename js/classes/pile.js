@@ -23,6 +23,10 @@ class Pile{
 		game.piles[this.player.player][this.type?this.type:"generic"] = this;
 	}
 	
+	get showCount(){
+		return this.cards.length>0&& (this.type==PILE_DECK || this.type==PILE_GRAVE || this.type==PILE_EXILE);
+	}
+	
 	get $(){
 		
 		let sel = `.playerSide[player='${this.player.player}'] .${this.pileClass}`;

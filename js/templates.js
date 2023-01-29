@@ -41,6 +41,10 @@ const viewPileTemplate = `
 
 const pileTemplate = `
 	<div class="pile">
+		<%if(this.showCount){%>
+			<div class="cardCounter pileCount"><%this.cards.length%></div>
+		<%}%>
+		
 		<%if(this.spread){%>
 			<%for(let i in this.cards){%>
 				<%TemplateEngine(cardTemplate,this.cards[i])%>

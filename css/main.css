@@ -58,6 +58,7 @@ user-select: none; /* Standard */
 
 .pile{
 	margin-top: 10px;
+	position:relative;
 }
 
 .cardFrame {
@@ -328,4 +329,13 @@ div#logOutput {
 
 .invalidUsername:after {
     content: "Invalid Username";
+}
+
+
+.pileCount {
+    position: absolute;
+    background: var(--mtg-fg-colour);
+    z-index: 99999;
+    right: 0px;
+    bottom: 10px;
 }
