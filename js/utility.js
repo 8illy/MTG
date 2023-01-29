@@ -2,6 +2,22 @@ function arrayMove(arr,from, to) {
 	arr.splice(to, 0, arr.splice(from, 1)[0]);
 };
 
+function parseDeckLine(e){
+	let parts = e.split(" ");
+	return {
+		quantity : Number(parts.shift()),
+		name : parts.join(" "),	
+	}
+}
+
+function filterEmpty(e){
+	return !!e && e.trim().length > 0;
+}
+
+function filterUnique(e,i,a){
+	return a.indexOf(e)==i;
+}
+
 function dragCard(ev) {
 	let uid  = ev.target.getAttribute("uid");
 	ev.dataTransfer.setData("selectedCard", uid);
@@ -81,9 +97,6 @@ function shuffle(array,start,end) {
 }
 
 
-function filterUnique(e,i,a){
-	return a.indexOf(e)==i;
-}
 
 function clone(arr){
 	return JSON.parse(JSON.stringify(arr));

@@ -150,10 +150,10 @@ class Game{
 		
 		let lines = rawTxt.split(/\r?\n/);
 		let sideLines = [];
-		lines = lines.filter(function(e){return !!e.trim()});
+		//lines = lines.filter(function(e){return !!e.trim()});
 
 		let sideboardIndex = lines.findIndex(function(a){
-			return a=="" || a.match(/sideboard/gi)
+			return a.trim()=="" || a.match(/sideboard/gi);
 		});
 	
 		if(sideboardIndex!=-1){
@@ -161,21 +161,12 @@ class Game{
 			lines = lines.slice(0,sideboardIndex);
 		}	
 		//get quantities & card names
-		lines = lines.map(function(e){
-			let parts = e.split(" ");
-			return {
-				quantity : Number(parts.shift()),
-				name : parts.join(" "),	
-			}
-		});
+		lines = lines.filter(filterEmpty).map(parseDeckLine);
 		
-		sideLines = sideLines.map(function(e){
-			let parts = e.split(" ");
-			return {
-				quantity : Number(parts.shift()),
-				name : parts.join(" "),	
-			}
-		});
+		sideLines = sideLines.filter(filterEmpty).filter(function(e){
+			return !e.match(/sideboard/gi);
+		}).map(parseDeckLine);
+		
 		
 		ownerPlayer.originalDeckList = lines;
 		ownerPlayer.originalSideDeckList = sideLines;
