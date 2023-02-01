@@ -152,10 +152,6 @@
 				</div>
 				
 				<div id="sidebarBoxTabStrip">
-					<div class="sidebarBoxTabStripItem" tabContent="#lifeCounter">
-						Life
-					</div>
-					
 					<div class="sidebarBoxTabStripItem" tabContent="#gameControls">
 						Actions <span class="fa fa-exclamation-circle" style="color:black;display:none;"></span>
 					</div>
@@ -205,22 +201,25 @@
 					</div>
 				</div>
 				
-				<div id="lifeCounter"  class="sidebarBox">
-					<div id="player1LifeDisplay" class="controlRow">
+				<div id="fieldControls" style="display:none;" class="sidebarBox">
+					
+					<div id="player1LifeDisplay" class="controlRow lifeDisplay">
 						<div class="controlRowInner">
 							<label for="player1Life" class="playerLifeLabel">Player 1</label>
-							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="game.player1.syncLife();"/>
+							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="game.player1.syncLife();">
 							<button onclick="game.player1.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
 					</div>
-					<div id="player2LifeDisplay" class="controlRow">
+					<div id="player2LifeDisplay" class="controlRow lifeDisplay">
 						<div class="controlRowInner">
 							<label for="player2Life" class="playerLifeLabel">Player 2</label>
-							<input id="player2Life" name="player2Life" type="number" class="playerLife" value="20" step="1" onchange="game.player2.syncLife();"/>
+							<input id="player2Life" name="player2Life" type="number" class="playerLife" value="20" step="1" onchange="game.player2.syncLife();">
 							<button onclick="game.player2.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
 					</div>
+					
 				</div>
+
 				<div id="gameControls" class="sidebarBox">
 				
 					<div class="container"> 

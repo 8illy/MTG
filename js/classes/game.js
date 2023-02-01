@@ -77,7 +77,7 @@ class Game{
 		}else{
 			this.player2.emptyPiles();
 		}
-
+		this.ui.moveFieldControls();
 		this.player1.piles.hand.faceUp = false;//cant see opps hand.
 	}
 	

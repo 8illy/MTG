@@ -53,6 +53,11 @@ class UI{
 		this.boardContainer.show();
 	}
 	
+	moveFieldControls(){
+		let controls = $("#fieldControls").show();
+		$("#fieldContainer > .playerSide:nth-child(1)").after(controls);
+	}
+	
 	showLoginForm(){
 		this.loginFormUser.val("");
 		this.loginFormPass.val("");
@@ -95,6 +100,7 @@ class UI{
 		$('[tabContent="#replaySidebarBox"]').show();
 		$(".playerLife").prop("readonly",true)
 		$(".resetDeckBtn").hide();
+		$('[tabcontent="#logSidebarBox"]').click();
 	}
 	
 	enablePracticeMode(){

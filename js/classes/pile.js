@@ -296,10 +296,12 @@ class Pile{
 	}
 	
 	resizeCardsIfOverflow(){
-		if(this.$.prop('scrollHeight') > this.$.height()){
-			this.$.find(".pile").addClass("overflownPile");
-		}else{
-			this.$.find(".pile").removeClass("overflownPile");
+		if(this.spread){//only resize on field, not in gy etc.
+			if(this.$.prop('scrollHeight') > this.$.height()){
+				this.$.find(".pile").addClass("overflownPile");
+			}else{
+				this.$.find(".pile").removeClass("overflownPile");
+			}
 		}
 	}
 	
@@ -340,7 +342,7 @@ class Pile{
 			"log" : `Stopped Viewing ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
 		
-		if(this.type==PILE_DECK && game.ui.autoShuffle){
+		if(this.type==PILE_DECK && game.ui.autoShuffle && !game.isReplay){
 			this.shuffle();
 		}
 		

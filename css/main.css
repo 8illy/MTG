@@ -53,7 +53,7 @@ user-select: none; /* Standard */
 }
 
 .playerSide {
-    margin-top: 20px;
+
 }
 
 .pile{
@@ -338,4 +338,16 @@ div#logOutput {
     z-index: 99999;
     right: 0px;
     bottom: 10px;
+}
+
+.lifeDisplay {
+    width: 45%;
+    display: inline-block;
+}
+
+#fieldControls {
+    padding: 10px;
+    margin: 0;
+    margin: 10px;
+	display:block;
 }
