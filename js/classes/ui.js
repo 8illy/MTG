@@ -11,6 +11,7 @@ class UI{
 		this.logOutputContainer = $("#logOutput");
 		this.loginForm = $("#loginForm");
 		this.deckForm = $("#deckForm");
+		this.hostForm = $("#hostForm");
 		this.replayForm = $("#replayForm");
 		this.mainMenu = $("#mainMenu");
 		this.boardContainer = $("#boardContainer");
@@ -28,6 +29,7 @@ class UI{
 		this.loadingContainer = $("#loadingContainer");
 		
 		this.topDeckCheckbox = $("#topDeckCheckbox");
+		this.autoShuffleCheckbox = $("#shuffleCheckbox");
 		this.scryShowOpponentCheckbox = $("#scryOpponent");
 		
 		this.viewPileContainer = $("#viewPileContainer");
@@ -65,6 +67,11 @@ class UI{
 		this.deckForm.show();
 	}	
 	
+	showHostForm(){
+		this.views.hide();
+		this.hostForm.show();
+	}	
+	
 	showReplayForm(){
 		this.views.hide();
 		this.replayForm.show();
@@ -83,7 +90,7 @@ class UI{
 	
 	enableReplayMode(){
 		this.showField();
-		$("#opponentForm").hide();
+	//	$("#opponentForm").hide();
 		$('[tabContent="#gameControls"]').hide();
 		$('[tabContent="#replaySidebarBox"]').show();
 		$(".playerLife").prop("readonly",true)
@@ -91,7 +98,7 @@ class UI{
 	}
 	
 	enablePracticeMode(){
-		$("#opponentForm").hide();
+	//	$("#opponentForm").hide();
 		//maybe hide logs?
 		$('[tabContent="#logSidebarBox"]').hide();
 	}
@@ -141,6 +148,10 @@ class UI{
 	
 	get toTopDeck(){
 		return this.topDeckCheckbox.prop("checked");
+	}
+	
+	get autoShuffle(){
+		return this.autoShuffleCheckbox.prop("checked");
 	}
 	
 	get scryShowOpponent(){
@@ -222,6 +233,15 @@ class UI{
 			return false;
 		});
 		
+	}
+	
+	renderGameList(){
+		let games = game.dbClient.requestedGames;
+		let out = "";
+		for(let opp in games){
+			out += TemplateEngine(gameRequest,opp);
+		}
+		$("#requestedGames").html(out);
 	}
 	
 	

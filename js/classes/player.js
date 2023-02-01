@@ -38,7 +38,7 @@ class Player{
 		
 	}
 
-	loadDeck(){
+	loadDeck(cb){
 		game.ui.loading();
 		
 		this.piles.deck.loadCards(this.originalDeckList,()=>{
@@ -47,9 +47,15 @@ class Player{
 				this.piles.side.loadCards(this.originalSideDeckList,()=>{
 					this.render();
 					game.ui.loadingPartDone();
+					if(typeof cb=="function"){
+						cb();
+					}
 				});
 			}else{
 				game.ui.loadingPartDone();
+				if(typeof cb=="function"){
+					cb();
+				}
 			}
 		});
 	}

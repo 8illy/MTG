@@ -339,6 +339,11 @@ class Pile{
 			"action" : "Log",
 			"log" : `Stopped Viewing ${highlight(this.player.player,colour)}s ${highlight(this.type,"coral")}`,
 		});
+		
+		if(this.type==PILE_DECK && game.ui.autoShuffle){
+			this.shuffle();
+		}
+		
 	}
 	
 }

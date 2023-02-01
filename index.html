@@ -49,6 +49,33 @@
 		
 		</div>
 		
+		<div id="hostForm" style="display:none" class="view viewMenu">
+			<div class="menuItemsContainer">
+				<div class="menuItemContainer menuItemTitle">
+					Opponent Name
+				</div>
+				<div class="menuItemContainer">
+					<input type="text" class="mainMenuButton" name="dbOpponent" id="dbOpponent">
+				</div>
+				<div class="menuItemContainer">
+					The Host should enter the name of the person they wish to play, and then click Host.
+				</div>
+				<div class="menuItemContainer">
+					<button class="mainMenuButton" onclick="game.host()">Host</button>
+				</div>
+				<div class="menuItemContainer">
+					 Once the other player has confirmed, the game will start.
+				</div>
+				
+				<div class="menuItemContainer">
+					<div id="requestedGames" class="container">
+					
+					</div>
+				</div>
+				
+			</div>
+		</div>		
+		
 		<div id="replayForm" style="display:none" class="view viewMenu">
 			<div class="menuItemsContainer">
 				<div class="menuItemContainer menuItemTitle">
@@ -185,10 +212,6 @@
 							<input id="player1Life" name="player1Life" type="number" class="playerLife" value="20" step="1" onchange="game.player1.syncLife();"/>
 							<button onclick="game.player1.reset();" class="resetDeckBtn">Reset Deck</button>
 						</div>
-						<div id="opponentForm">
-							<input type="text" name="dbOpponent" id="dbOpponent">
-							<button onclick="game.host()">Host</button>
-						</div>
 					</div>
 					<div id="player2LifeDisplay" class="controlRow">
 						<div class="controlRowInner">
@@ -207,35 +230,32 @@
 								<input type="checkbox" checked id="topDeckCheckbox" name="topDeckCheckbox"/>
 							</div>
 							<div class="col-6 btnRow">
-								<input type="number" step="1" value="3" id="scryNumber"/>
-								<button onclick="game.ui.setAction('scry',this);">Scry</button>
-								<input type="checkbox" unchecked id="scryOpponent"/>
+								<label for="shuffleCheckbox">Auto Shuffle</label>
+								<input type="checkbox" checked id="shuffleCheckbox" name="shuffleCheckbox"/>
 							</div>
+							
 						</div>
 						<div class="row">
 							<div class="col-6">
 								<button onclick="game.ui.setAction('shuffle',this);">Shuffle</button>
 							</div>
-							<div class="col-6">
-								<button onclick="game.ui.setAction('addCounter',this);game.ui.setActionParam('Colour','addCounter');">Counter</button>
+							<div class="col-6 btnRow">
+								<input type="number" step="1" value="3" id="scryNumber"/>
+								<button onclick="game.ui.setAction('scry',this);">Scry</button>
+								<input type="checkbox" unchecked id="scryOpponent"/>
 							</div>
+							
 						</div>
 						<div class="row">
 							<div class="col-6">
 								<button onclick="game.ui.setAction('flip',this);">Flip</button>
 							</div>
 							<div class="col-6">
-								<button onclick="game.loadNewCards();">Add</button>
+								<button onclick="game.ui.setAction('addCounter',this);game.ui.setActionParam('Colour','addCounter');">Counter</button>
 							</div>
+							
 						</div>
-						<div class="row">
-							<div class="col-6">
-								<button onclick="game.ui.setAction('clone',this);">Clone</button>
-							</div>
-							<div class="col-6">
-								<button onclick="game.ui.setAction('destroy',this);">Destroy</button>
-							</div>
-						</div>
+						
 						
 						<div class="row">
 							<div class="col-6">
@@ -251,6 +271,22 @@
 							</div>
 							<div class="col-6">
 								<button onclick="game.player1.piles.side.viewPile()">View Opps Side Deck</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<button onclick="game.loadNewCards();">Add</button>
+							</div>
+							<div class="col-6">
+								<button onclick="game.ui.setAction('clone',this);">Clone</button>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-6">
+								<button onclick="game.ui.setAction('destroy',this);">Destroy</button>
+							</div>
+							<div class="col-6">
+								<button onclick="game.dbClient.downloadReplay()">Download Replay</button>
 							</div>
 						</div>
 					

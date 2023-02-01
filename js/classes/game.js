@@ -21,9 +21,7 @@ class Game{
 		return this.dbClient instanceof Replay;
 	}
 	
-	host(){
-		this.dbClient.connectOpponent(this.ui.opponent);
-	}
+
 
 	login(){
 		this.ui.loading();
@@ -32,6 +30,7 @@ class Game{
 	}
 	
 	enablePracticeMode(){
+		this.practiceMode = true;
 		this.setup();
 		this.dbClient = new DBClient();
 		this.ui.enablePracticeMode();
@@ -135,17 +134,52 @@ class Game{
 				this.enablePracticeMode();
 			}
 			
-			this.processDeckList(fr.result,this.player2);
+			this.processDeckList(fr.result,this.player2,()=>{this.afterDeckImport();});
 
-			this.ui.showField();
+			
 		}
 			
 		fr.readAsText(deckFile);
 	}
 	
+	afterDeckImport(){
+		if(this.practiceMode){
+			this.ui.showField();
+		}else{
+			this.ui.showHostForm();
+		}
+	}
 	
+	startGame(){
+		this.ui.showField();
+		this.render();
+	}
 	
-	processDeckList(rawTxt,ownerPlayer){
+	host(){
+		this.ui.loading();
+		this.dbClient.hostGame(this.ui.opponent);
+	}
+	
+	acceptOrRejectGame(name){
+		delete this.dbClient.requestedGames[name];
+		this.ui.renderGameList();
+	}
+	
+	acceptGame(name){
+		this.acceptOrRejectGame(name);
+		this.dbClient.sendMessage(name,{
+			action : "Accept Game",
+		});
+	}
+	
+	rejectGame(name){
+		this.acceptOrRejectGame(name);
+		this.dbClient.sendMessage(name,{
+			action : "Reject Game",
+		});
+	}
+	
+	processDeckList(rawTxt,ownerPlayer,cb){
 		//ownerPlayer.rawTxtDecklist = rawTxt;//outdated, as will change this for commander
 		
 		let lines = rawTxt.split(/\r?\n/);
@@ -171,10 +205,15 @@ class Game{
 		ownerPlayer.originalDeckList = lines;
 		ownerPlayer.originalSideDeckList = sideLines;
 		
-		ownerPlayer.loadDeck();
+		ownerPlayer.loadDeck(cb);
 		
 	
 		
+	}
+	
+	render(){
+		this.player1.render();
+		this.player2.render();
 	}
 	
 }

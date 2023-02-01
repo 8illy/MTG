@@ -39,6 +39,20 @@ const viewPileTemplate = `
 	</div>
 `;
 
+const gameRequest = `
+	<div class = "row">
+		<div class="col-6">
+			<%this%>
+		</div>
+		<div class="col-3">
+			<a href="javascript:game.acceptGame('<%this%>');" style="color:green;">Accept</a>
+		</div>
+		<div class="col-3">
+			<a href="javascript:game.rejectGame('<%this%>');" style="color:red;">Reject</a>
+		</div>
+	</div>
+`;
+
 const pileTemplate = `
 	<div class="pile">
 		<%if(this.showCount){%>

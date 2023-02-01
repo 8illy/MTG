@@ -25,6 +25,8 @@ class DBClient{
 		this.receivedMessagesToBeProcessed = {};//received messages, not yet processed.
 		this.lastReceivedMessageID = 0;
 		
+		this.requestedGames = {};
+		
 		if(this.username && this.rawPassword){
 			this.login();
 		}
@@ -113,16 +115,30 @@ class DBClient{
 		this.socket.send(JSON.stringify(data));
 	}
 	
-	sendToOpponent(data){
-
+	
+	sendMessage(name,data){
 		let message = {
 			action:"Private message",
 			message:JSON.stringify(data), 
-			username:this.opponent
+			username:name
 		};
 		
+		this.send(message);
+	}
+	
+	sendQueuedMessage(name,data){
+		let message = {
+			action:"Private message",
+			message:JSON.stringify(data), 
+			username:name
+		};
+		
+		this.msgQueue.push(data);
+	}
+	
+	sendToOpponent(data){
 		if(this.opponent){ 
-			this.msgQueue.push(data);
+			this.sendQueuedMessage(this.opponent,data);
 		}
 	}
 	
@@ -286,6 +302,16 @@ class DBClient{
 		
 	}
 	
+	hostGame(opponentName){
+		let message = {
+			action : "Request Game",
+		};
+		
+		//make sure this doesnt go through queue.
+		this.sendMessage(opponentName,message);
+	}
+	
+	
 	connectOpponent(opponent){
 		this.opponent = opponent;
 		game.player1.setName(opponent);		
@@ -340,57 +366,81 @@ class DBClient{
 			
 			//for now just assume no one real will pm us.
 			let allData = JSON.parse(msg.message);
-			
-			if(sender==this.username){				
-				if(!this.msgCache[allData.msgId]){
-					console.log("duplicate message sent",allData.msgId);
-					return false;
-				}else{
-					console.log("confirm message sent",allData.msgId);
-					this.confirmMessageSent(allData.msgId);
-				}
+
+			if(allData.action){
+				//game setup
+				return this.onGameMsg(allData,sender);
+			}else{
+				//message from opponent/you
+				return this.onOpponentMsg(allData,sender,msg);
 			}
 	
-
-			if((!this.opponent ||sender==this.opponent )&& sender!=this.username && (this.lastReceivedMessageID + 1) != allData.msgId){
-
-				if(allData.msgId <= this.lastReceivedMessageID){
-					return false;
-				}
-				this.receivedMessagesToBeProcessed[allData.msgId] = msg;
+		}
+		return true;
+	}
+	
+	onGameMsg(data,sender){
+		
+		if(sender==game.ui.opponent){
+			if(data.action=="Accept Game"){
+				game.ui.loadingPartDone();
+				this.connectOpponent(sender);
+				game.startGame();//maybe wait on this one?
+			}else if(data.action=="Reject Game"){
+				game.ui.loadingPartDone();
+				//idk?
+			} 
+		}else if(sender!= this.username){
+			if(data.action=="Request Game"){
+				this.requestedGames[sender] = 1;//maybe put other details here, lobby name or something?
+				game.ui.renderGameList();
+			}
+		}
+		
+		return true;
+	}
+	
+	onOpponentMsg(allData,sender,msg){
+		
+		if(sender==this.username){				
+			if(!this.msgCache[allData.msgId]){
+				console.log("duplicate message sent",allData.msgId);
 				return false;
 			}else{
-				if(sender==this.opponent){
-					delete this.receivedMessagesToBeProcessed[allData.msgId];
-					this.lastReceivedMessageID = allData.msgId;
-				}
-				
-				
-				if(!this.opponent || (sender==this.opponent /*&& !this.receivedMessages[allData.msgId]*/) || sender==this.username){
-					for(let data of allData.data){
-						if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
-							this.lastReceivedMessageID = allData.msgId;//fix for initial loading.
-							this.connectOpponent(sender);//send them our decklist
-						}
-						
-						if(sender==this.opponent){
-							this.onMtgMsg(data,sender);
-						}
-						
-						this.gameLog.push({data:data,sender:sender});//to build replays
-						this.onMtgMsgLog(data,sender);
-					}
-					
-				}
+				console.log("confirm message sent",allData.msgId);
+				this.confirmMessageSent(allData.msgId);
+			}
+		}
 			
+		if((!this.opponent ||sender==this.opponent )&& sender!=this.username && (this.lastReceivedMessageID + 1) != allData.msgId){
+			if(allData.msgId <= this.lastReceivedMessageID){
+				return false;
+			}
+			this.receivedMessagesToBeProcessed[allData.msgId] = msg;
+			return false;
+		}else{
+			if(sender==this.opponent){
+				delete this.receivedMessagesToBeProcessed[allData.msgId];
+				this.lastReceivedMessageID = allData.msgId;
 			}
 			
 			
-			
-			
-				
-				
-			
+			if(!this.opponent || (sender==this.opponent /*&& !this.receivedMessages[allData.msgId]*/) || sender==this.username){
+				for(let data of allData.data){
+					if(data.action=="Start Game"&&sender!=this.username&&!this.opponent){
+						this.lastReceivedMessageID = allData.msgId;//fix for initial loading.
+						this.connectOpponent(sender);//send them our decklist
+						game.startGame();
+					}
+					
+					if(sender==this.opponent){
+						this.onMtgMsg(data,sender);
+					}
+					
+					this.gameLog.push({data:data,sender:sender});//to build replays
+					this.onMtgMsgLog(data,sender);
+				}	
+			}	
 		}
 		return true;
 	}
